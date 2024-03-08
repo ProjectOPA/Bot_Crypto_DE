@@ -1,0 +1,9 @@
+# ignorer les fichiers .pyc
+*.pyc
+
+# ignorer le répertoire venv
+.venv/
+
+# ignorer les fichiers de configuration spécifiques
+config.ini
+secrets.txt
