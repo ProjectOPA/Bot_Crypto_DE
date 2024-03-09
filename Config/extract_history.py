@@ -13,8 +13,8 @@ import time
 
 
 # clés d'API Binance(il faudra les mettre dans les secrets de GitHub)
-api_key = "oe66T3IP3mAu6cBocrIIXTbBsQqepDJfIX73GvFsOE5Bv2gponeifzYUQqN2upqR"
-api_secret = "J9X2jNzZLfPtZjNE0yGik3lhekhHpsbur9DQuR7QRDFVFxJWLgsOR0fASu6Z6CaE"
+api_key = "<api_key>"
+api_secret = "<api_secret>"
 
 # URL de l'API Binance pour les données historiques klines (candles)
 api_url = "https://api.binance.com/api/v3/klines"
