@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   database:
-    container_name: mongo_project_api_binance
+    container_name: mongo-project-api-binance
     image: mongo:5.0
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
@@ -13,7 +13,7 @@ services:
     ports:
       - '27017:27017'
     volumes: 
-      - ./sample_training:/data/db
+      - ../Application/sample_training:/data/db
 
   mongoexpress:
     container_name: mongo-express-api-binance
