@@ -2,8 +2,7 @@
 *.pyc
 
 # ignorer le répertoire venv
-.venv/
+* .venv/
 
 # ignorer les fichiers de configuration spécifiques
-config.ini
-secrets.txt
+.config.ini
