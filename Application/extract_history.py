@@ -12,13 +12,6 @@ from datetime import datetime
 import time
 
 
-# clés d'API Binance(les secrets sont créées sur GitHub, il faudra les mettre dans le fichier YAML du workflow)
-api_key = "<api_key>"
-api_secret = "<api_secret>"
-
-# URL de l'API Binance pour les données historiques klines (candles)
-api_url = "https://api.binance.com/api/v3/klines"
-
 # authentification à MongoDB
 # définition des informations d'identification nécessaires
 # pour s'authentifier auprès de MongoDB.
@@ -40,6 +33,21 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
+# clés d'API Binance(les secrets sont créées sur GitHub, il faudra les mettre dans le fichier YAML du workflow)
+api_key = "<api_key>"
+api_secret = "<api_secret>"
+
+# URL de l'API Binance pour les données historiques klines (candles)
+api_url = "https://api.binance.com/api/v3/klines"
+
+# Dans le contexte du trading financier,
+# une bougie (candlestick ou candle en anglais)
+# est une représentation graphique d'une unité de temps spécifique
+# (comme une minute, une heure, un jour, etc.)
+# des mouvements de prix d'un actif financier,
+# tel qu'une paire de devises,
+# une action ou une crypto-monnaie.
+
 
 # définition d'une fonction
 # pour obtenir des données historiques depuis l'API Binance
@@ -50,15 +58,6 @@ def get_binance_data(symbol, interval, limit=1000):
     data = response.json()
 
     return data
-
-
-# Dans le contexte du trading financier,
-# une bougie (candlestick ou candle en anglais)
-# est une représentation graphique d'une unité de temps spécifique
-# (comme une minute, une heure, un jour, etc.)
-# des mouvements de prix d'un actif financier,
-# tel qu'une paire de devises,
-# une action ou une crypto-monnaie.
 
 
 # définition d'une fonction
