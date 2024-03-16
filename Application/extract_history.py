@@ -104,7 +104,7 @@ if __name__ == "__main__":
     # des transactions (trades) pour la paire "BTCUSDT"
     symbols = ["BTCUSDT"]
     # choix de l'intervalle (1m, 1h, 1d, etc.)
-    interval = "1h"
+    interval = "1s"
 
     for symbol in symbols:
         # appel de la fonction get_binance_data
@@ -118,4 +118,7 @@ if __name__ == "__main__":
     print("Données historiques stockées dans MongoDB avec succès.")
 
     # délai de 24 heures avant la prochaine extraction
+    # s'assurer que cela correspond à nos besoins
+    # et aux limites de l'API Binance pour éviter tout blocage
+    # ou suspension de l'accès.
     time.sleep(24 * 60 * 60)  # 24 heures en secondes
