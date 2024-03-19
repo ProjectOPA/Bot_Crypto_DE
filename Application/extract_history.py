@@ -14,7 +14,7 @@ import time
 
 # authentification à MongoDB
 # définition des informations d'identification nécessaires
-# pour s'authentifier auprès de MongoDB.
+# pour s'authentifier auprès de MongoDB en local
 mongo_user = "admin"
 mongo_password = "pass"
 mongo_host = "localhost"
