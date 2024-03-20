@@ -113,3 +113,4 @@ if __name__ == "__main__":
             store_in_mongodb(historical_data, symbol)
 
 # faire CTRL+C pour arreter la boucle
+# ou dans un autre terminal sudo docker-compose down
