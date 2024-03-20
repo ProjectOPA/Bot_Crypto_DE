@@ -8,9 +8,6 @@ from pymongo import MongoClient
 # datetime pour manipuler des objets datetime
 from datetime import datetime
 
-# import du module time pour gérer le temps
-import time
-
 
 # authentification à MongoDB
 # définition des informations d'identification nécessaires
@@ -33,9 +30,9 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
-# clés d'API Binance(les secrets sont créées sur GitHub, il faudra les mettre dans le fichier YAML du workflow)
-api_key = "<api_key>"
-api_secret = "<api_secret>"
+# # clés d'API Binance(les secrets sont créées sur GitHub, il faudra les mettre dans le fichier YAML du workflow)
+# api_key = "<api_key>"
+# api_secret = "<api_secret>"
 
 # URL de l'API Binance pour les données historiques klines (candles)
 api_url = "https://api.binance.com/api/v3/klines"
@@ -51,8 +48,8 @@ api_url = "https://api.binance.com/api/v3/klines"
 
 # définition d'une fonction
 # pour obtenir des données historiques depuis l'API Binance
-def get_binance_data(symbol, interval, limit=1000):
-    params = {"symbol": symbol, "interval": interval, "limit": limit}
+def get_binance_data(symbol, interval):
+    params = {"symbol": symbol, "interval": interval}
 
     response = requests.get(api_url, params=params)
     data = response.json()
@@ -106,19 +103,13 @@ if __name__ == "__main__":
     # choix de l'intervalle (1m, 1h, 1d, etc.)
     interval = "1s"
 
-    for symbol in symbols:
-        # appel de la fonction get_binance_data
-        # pour obtenir les données historiques pour le symbole et l'intervalle spécifiés.
-        historical_data = get_binance_data(symbol, interval)
-        # appel la fonction store_in_mongodb
-        # pour stocker les données historiques dans MongoDB pour le symbole actuel.
-        store_in_mongodb(historical_data, symbol)
+    while True:
+        for symbol in symbols:
+            # appel de la fonction get_binance_data
+            # pour obtenir les données historiques pour le symbole et l'intervalle spécifiés.
+            historical_data = get_binance_data(symbol, interval)
+            # appel la fonction store_in_mongodb
+            # pour stocker les données historiques dans MongoDB pour le symbole actuel.
+            store_in_mongodb(historical_data, symbol)
 
-    # affichage d'un message succès
-    print("Données historiques stockées dans MongoDB avec succès.")
-
-    # délai de 24 heures avant la prochaine extraction
-    # s'assurer que cela correspond à nos besoins
-    # et aux limites de l'API Binance pour éviter tout blocage
-    # ou suspension de l'accès.
-    time.sleep(24 * 60 * 60)  # 24 heures en secondes
+# faire CTRL+C pour arreter la boucle
