@@ -1,0 +1,87 @@
+version: "3.3"
+
+services:
+  # api-binance:
+  #   image: ubuntu:22.04
+  #   container_name: ubuntu-project-api-binance
+  #   networks:
+  #     - my-network-from-compose
+  #   volumes:
+  #     - .:/home
+  #   ports:
+  #     - "8888:8888"
+  #   command: tail -f /dev/null
+    
+  database:
+    container_name: mongo-project-api-binance
+    image: mongo:5.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_DATABASE=auth
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    networks: 
+      - my-network-from-compose
+    ports:
+      - '27017:27017'
+    volumes: 
+      - ./Application/sample_training:/data/db
+
+  mongoexpress:
+    container_name: mongo-express-api-binance
+    image: mongo-express:0.54
+    depends_on:
+      - database
+    networks: 
+      - my-network-from-compose
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo-project-api-binance 
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    ports:
+      - '8081:8081'
+    volumes: 
+      - ./sample_training:/data/db 
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181"
+    networks: 
+      - my-network-from-compose
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092-9094:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks: 
+      - my-network-from-compose
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  kafkaui:
+    image: provectuslabs/kafka-ui
+    container_name: kafkaui
+    depends_on:
+      - kafka
+      - zookeeper
+    ports:
+      - "8080:8080"
+    networks: 
+      - my-network-from-compose
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+
+networks:
+  my-network-from-compose:
+    driver: bridge
