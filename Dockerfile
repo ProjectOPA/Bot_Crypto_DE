@@ -1,7 +1,7 @@
 # commande pour construire l'image Docker
 # une que le fichier Dockerfile est créé, 
 # on peut construire l'image Docker à partir de ce fichier en utilisant la commande suivante :
-# sudo docker image build . -t my_image_test_docker:latest
+# sudo docker image build . -t image_api_binance_opa:1.0.0
 
 # commandes de base pour la création d'une image Docker
 FROM ubuntu:20.04
