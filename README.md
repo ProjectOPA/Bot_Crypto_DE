@@ -20,5 +20,4 @@ cd Application/
 python3 extract_history.py
 
 ## éteindre docker-compose
-exit
 sudo docker-compose down
