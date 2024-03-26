@@ -55,7 +55,6 @@ services:
 
   kafka:
     image: wurstmeister/kafka # vérifier la version pour vulnérabilité et compatibilité avec le Dockerfile
-    container_name: kafka
     depends_on:
       - zookeeper
     ports:
