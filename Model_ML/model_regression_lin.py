@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
 
-# définir une fonction pour entraîner un modèle de régression linéaire
+# définition d'une fonction pour entraîner un modèle de régression linéaire
 def train_linear_regression_model():
     warnings.filterwarnings("ignore")
     """
