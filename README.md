@@ -1,6 +1,12 @@
 # Bot_Crypto_DE
 Crypto bot pour projet de Data Engineer
 
+#### s'assurez-vous que le service Docker est en cours d'exécution sur votre système. Vous pouvez démarrer le service Docker en utilisant la commande suivante :
+pip install --upgrade docker-compose
+
+#### si problème d'installation de docker-compose.  Cette commande force l'installation de la dernière version disponible de docker-compose, même si une version antérieure est déjà installée
+sudo service docker start
+
 ## ouvrir un terminal et exécuter le docker-compose
 sudo docker-compose up -d
 
