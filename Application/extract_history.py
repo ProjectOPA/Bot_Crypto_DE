@@ -6,8 +6,10 @@ import requests
 from pymongo import MongoClient
 
 # datetime pour manipuler des objets datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 
+
+import time
 
 # authentification à MongoDB
 # définition des informations d'identification nécessaires
@@ -30,12 +32,30 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
-# # clés d'API Binance(les secrets sont créées sur GitHub, il faudra les mettre dans le fichier YAML du workflow)
-# api_key = "<api_key>"
-# api_secret = "<api_secret>"
-
 # URL de l'API Binance pour les données historiques klines (candles)
 api_url = "https://api.binance.com/api/v3/klines"
+
+# choix des crypto-monnaies
+# création d'une liste pour lesquels on récupére les données historiques
+# des transactions (trades) pour la paire "BTCUSDT"
+symbols = ["BTCUSDT"]
+# choix de l'intervalle (1m, 1h, 1d, etc.)
+interval = "2h"
+
+
+# définition d'une fonction
+# pour obtenir des données historiques depuis l'API Binance
+def get_binance_data(symbol, interval, start_date, end_date):
+    params = {
+        "symbol": symbol,
+        "interval": interval,
+        "startTime": start_date,
+        "endTime": end_date,
+    }
+    response = requests.get(api_url, params=params)
+    data = response.json()
+    return data
+
 
 # Dans le contexte du trading financier,
 # une bougie (candlestick ou candle en anglais)
@@ -44,17 +64,6 @@ api_url = "https://api.binance.com/api/v3/klines"
 # des mouvements de prix d'un actif financier,
 # tel qu'une paire de devises,
 # une action ou une crypto-monnaie.
-
-
-# définition d'une fonction
-# pour obtenir des données historiques depuis l'API Binance
-def get_binance_data(symbol, interval):
-    params = {"symbol": symbol, "interval": interval}
-
-    response = requests.get(api_url, params=params)
-    data = response.json()
-
-    return data
 
 
 # définition d'une fonction
@@ -74,43 +83,76 @@ def store_in_mongodb(data, symbol):
         close_price = float(candle[4])
         volume = float(candle[5])
 
-        # création d'un dictionnaire 'candle_data'
-        # dans la database représentant les données de la bougie
         candle_data = {
-            "symbol": symbol,  # symbole associé à la bougie
-            "timestamp": timestamp,  # moment de la bougie
-            "open": open_price,  # prix d'ouverture de la bougie
-            "high": high_price,  # prix le plus haut de la bougie
-            "low": low_price,  # prix le plus bas de la bougie
-            "close": close_price,  # prix de clôture de la bougie
-            "volume": volume,  # volume de la bougie
+            # symbol: c'est le symbole de la paire de trading pour laquelle les données sont collectées
+            # "BTCUSDT" indique que les données sont pour la paire de trading Bitcoin (BTC)
+            # par rapport à l'US Dollar Tether (USDT)
+            "symbol": symbol,
+            # timestamp: c'est le moment précis de la bougie (candle) représentée par cette ligne
+            # il est donné en heure universelle coordonnée (UTC) sous forme de chaîne de caractères formatée
+            "timestamp": timestamp,
+            # open:c'est le prix d'ouverture de la bougie,
+            # c'est-à-dire le prix auquel la paire de trading a commencé à être échangée à ce moment précis
+            "open": open_price,
+            # high: c'est le prix le plus élevé atteint pendant cette bougie
+            "high": high_price,
+            # low: c'est le prix le plus bas atteint pendant cette bougie
+            "low": low_price,
+            # close: c'est le prix de clôture de la bougie,
+            # c'est-à-dire le prix auquel la paire de trading a été échangée à la fin de cette bougie
+            "close": close_price,
+            # volume: c'est le volume de trading qui indique la quantité totale d'actifs échangés pendant cette bougie.
+            "volume": volume,
         }
-
-        # insertion des données de la bougie dans la collection MongoDB spécifiée
         collection.insert_one(candle_data)
 
 
-# point d'entrée du script 'if __name__ == "__main__"': :
-# cette ligne vérifie si le script est exécuté directement
-# (pas importé comme module dans un autre script).
-# Cela permet d'assurer que le bloc de code ci-dessous
-# est exécuté uniquement lorsque le script est exécuté en tant que programme principal.
-if __name__ == "__main__":
-    # choix des crypto-monnaies
-    # création d'une liste pour lesquels on récupére les données historiques
-    # des transactions (trades) pour la paire "BTCUSDT"
-    symbols = ["BTCUSDT"]
-    # choix de l'intervalle (1m, 1h, 1d, etc.)
-    interval = "1s"
+# définition de la fonction pour récupérer les données historiques
+def collect_historical_data():
+    # détermination de la date d'aujourd'hui
+    end_date = datetime.now()
 
-    while True:
+    # calcul de la date il y a 4 ans
+    start_date = end_date - timedelta(days=365 * 4)
+
+    # utilisation d'une boucle pour récupérer les données pour chaque jour sur une période de 4 ans
+    while start_date <= end_date:
         for symbol in symbols:
-            # appel de la fonction get_binance_data
-            # pour obtenir les données historiques pour le symbole et l'intervalle spécifiés.
-            historical_data = get_binance_data(symbol, interval)
-            # appel la fonction store_in_mongodb
-            # pour stocker les données historiques dans MongoDB pour le symbole actuel.
+            # appel de la fonction get_binance_data pour obtenir les données historiques pour chaque jour
+            historical_data = get_binance_data(
+                symbol,
+                interval,
+                int(start_date.timestamp() * 1000),
+                int((start_date + timedelta(days=1)).timestamp() * 1000),
+            )
+            # stockage des données dans MongoDB
             store_in_mongodb(historical_data, symbol)
+
+        # incrémentation pour passage au jour suivant
+        start_date += timedelta(days=1)
+
+        # attente d'une seconde entre chaque jour pour éviter de surcharger l'API Binance
+        # nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
+        # et avoir une erreur au niveau du serveur de l'API
+        # mise en pause de 1 seconde entre chaque jour
+        time.sleep(1)
+
+
+# point d'entrée du script
+if __name__ == "__main__":
+    # Appel à la fonction pour collecter les données historiques
+    collect_historical_data()
+
 
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
+
+# je vais mettre en place un cronjob pour lancer le script en arrière-plan
+# pour récupérer les données de la journée précédente
+# et les stocker dans MongoDB
+# pour les symboles et l'intervalle spécifiés.
+# configuration du cronjob dans le fichier crontab
+# crontab - e
+# ajout de la ligne suivante pour exécuter le script toutes les secondes
+# execution de la commande toutes les secondes
+# python3 Application/extract_history.py
