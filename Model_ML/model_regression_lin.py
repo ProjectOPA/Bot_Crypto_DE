@@ -103,6 +103,12 @@ def train_linear_regression_model():
     train_r2 = regressor.score(X_train_imputed, y_train)
     test_r2 = regressor.score(X_test_imputed, y_test)
 
+    # # affichage du coefficient de détermination R2 sur le jeu d'entraînement
+    # print("Coefficient de détermination du modèle sur train:", train_r2)
+
+    # # affichage du coefficient de détermination R2 sur le jeu de test
+    # print("Coefficient de détermination du modèle sur test:", test_r2)
+
     # visualisation des prédictions
     fig = plt.figure(figsize=(10, 10))
     pred_test = regressor.predict(X_test_imputed)
