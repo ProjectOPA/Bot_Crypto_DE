@@ -11,17 +11,22 @@ kafka_conf = {
 
 #Configuration MongoDB
 mongo_conf = {
+    'user' : "admin",
+    'password' : 'pass',
     'host': 'localhost',  # Adresse de l'hôte MongoDB
     'port': 27017,  # Port MongoDB
-    'database': 'OPA',  # Nom de la base de données MongoDB
-    'collection': 'BTCUSDT'  # Nom de la collection MongoDB
+    'database': 'extract_data_binance',  # Nom de la base de données MongoDB
+    'collection': 'streaming_data'  # Nom de la collection MongoDB
 }
 
 # Création du consommateur Kafka
 consumer = Consumer(kafka_conf)
 
+#URI de connection à Mongo DB
+uri = f"mongodb://{mongo_conf['user']}:{mongo_conf['password']}@{mongo_conf['host']}:{mongo_conf['port']}/"
+
 # Connexion à la base de données MongoDB
-client = MongoClient(mongo_conf['host'], mongo_conf['port'])
+client = MongoClient(uri)
 db = client[mongo_conf['database']]
 collection = db[mongo_conf['collection']]
 
