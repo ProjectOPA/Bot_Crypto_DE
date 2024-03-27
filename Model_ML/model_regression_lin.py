@@ -7,6 +7,19 @@ from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
+# authentification à MongoDB
+mongo_user = "admin"
+mongo_password = "pass"
+mongo_host = "localhost"
+mongo_port = 27017
+
+# connexion à la base de données et à la collection
+client = MongoClient(
+    f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/"
+)
+db = client["extract_data_binance"]
+collection = db["historical_data"]
+
 
 # définition d'une fonction pour entraîner un modèle de régression linéaire
 def train_linear_regression_model():
@@ -55,19 +68,6 @@ def train_linear_regression_model():
     et affiche un nuage de points pour visualiser les prédictions du modèle.
 
     """
-    # authentification à MongoDB
-    mongo_user = "admin"
-    mongo_password = "pass"
-    mongo_host = "localhost"
-    mongo_port = 27017
-
-    # connexion à la base de données et à la collection
-    client = MongoClient(
-        f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/"
-    )
-    db = client["extract_data_binance"]
-    collection = db["historical_data"]
-
     # récupération des données dans un DataFrame
     df = pd.DataFrame(list(collection.find()))
 
