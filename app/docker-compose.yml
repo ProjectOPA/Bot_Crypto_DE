@@ -43,7 +43,7 @@ services:
     ports:
       - '8081:8081'
     volumes: 
-      - ./.data/historical:/data/db 
+      - ./.data:/data/db 
 
   zookeeper:
     image: wurstmeister/zookeeper # vérifier la version pour vulnérabilité et compatibilité avec le Dockerfile
