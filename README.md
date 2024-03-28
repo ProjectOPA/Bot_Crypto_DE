@@ -16,8 +16,8 @@ Crypto bot pour projet de Data Engineer
 1. Extract
     - extraction des données historiques
     - extraction des données de streamings
-    - stockage des données historiques dans le dossier data
-    - stockage des données de streamings dans le dossier data
+    - stockage des données historiques dans le dossier .data/historical
+    - stockage des données de streamings dans le dossier ./data/streaming
 
 2. Transform (pré-processing)
     - transformation des données historiques stockées
