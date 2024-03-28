@@ -8,4 +8,4 @@
 .config.ini
 
 # ignorer tout le répertoire data
-*data/
+*.data/
