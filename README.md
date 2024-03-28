@@ -1,6 +1,5 @@
 # Bot_Crypto_DE
 Crypto bot pour projet de Data Engineer
-Approche d'une programmation fonctionnelle
 
 - git clone https://github.com/ProjectOPA/Bot_Crypto_DE.git
 
@@ -12,7 +11,8 @@ Approche d'une programmation fonctionnelle
 
 - pip install -r requirements.txt
 
-## Architecture logiciel ETL
+## Approche d'une programmation fonctionnelle
+### Architecture logiciel ETL
 1. Extract
     - extraction des données historiques
     - extraction des données de streamings
