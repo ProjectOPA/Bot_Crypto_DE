@@ -10,6 +10,8 @@ Approche d'une programmation fonctionnelle
 
 - source .venv/bin/activate
 
+- pip install -r requirements.txt
+
 ## Architecture logiciel ETL
 1. Extract
     - extraction des données historiques
@@ -41,17 +43,6 @@ sudo docker-compose up -d
 <!-- ## accès au terminal ubuntu
 docker exec -it ubuntu-project-api-binance bash
 
-## installation de python et pip
-cd home
-apt-get update
-apt-get install -y python3 python3-pip
-
-## installation des dépendances
-pip install -r requirements.txt -->
-
-cd Application/
-
-python3 extract_history.py
 
 ## éteindre docker-compose
 sudo docker-compose down
