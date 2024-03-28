@@ -28,8 +28,8 @@ Crypto bot pour projet de Data Engineer
     - chargement des données de streamings transformées
 
 4. Model 
-    - entrainement et prédiction sur les données historiques transformées
-    - entrainement et prédiction sur les données de streamings transformées
+    - entrainement sur les données historiques transformées
+    - prédiction sur les données de streamings transformées
 
 #### s'assurez-vous que le service Docker est en cours d'exécution sur votre système. Vous pouvez démarrer le service Docker en utilisant la commande suivante :
 pip install --upgrade docker-compose
