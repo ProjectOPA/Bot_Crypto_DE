@@ -2,6 +2,14 @@
 Crypto bot pour projet de Data Engineer
 Approche d'une programmation fonctionnelle
 
+- git clone https://github.com/ProjectOPA/Bot_Crypto_DE.git
+
+- cd app
+
+- python3 -m venv .venv
+
+- source .venv/bin/activate
+
 ## Architecture logiciel ETL
 1. Extract
     - extraction des données historiques
