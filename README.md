@@ -1,7 +1,6 @@
 # Bot_Crypto_DE
 Crypto bot pour projet de Data Engineer
 
-
 - git clone https://github.com/ProjectOPA/Bot_Crypto_DE.git
 
 - cd app
