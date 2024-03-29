@@ -19,7 +19,7 @@ client = MongoClient(
 db = client["extract_data_binance"]
 
 # instanciation de la collection
-collection = db["producer_data"]
+collection = db["streaming_data"]
 
 
 # utilisation du modèle entraîné pour prédire le valeur cible 'close' sur des données de streaming
@@ -44,7 +44,7 @@ def predict_close(streaming_data, model):
         num_imputer.fit_transform(feats_streaming), columns=feats_streaming.columns
     )
 
-    # prédiction des prix de clôture
+    # prédiction valeur de clôture
     predictions = model.predict(feats_streaming_clean)
 
     # retourne les prédictions
