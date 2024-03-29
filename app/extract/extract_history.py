@@ -133,12 +133,6 @@ def collect_historical_data():
         # incrémentation pour passage au jour suivant
         start_date += timedelta(days=1)
 
-        # attente d'une seconde entre chaque jour pour éviter de surcharger l'API Binance
-        # nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
-        # et avoir une erreur au niveau du serveur de l'API
-        # mise en pause de 1 seconde entre chaque jour
-        # time.sleep(1)
-
 
 # appel de la fonction pour récupérer requeter et stocker les données historiques
 collect_historical_data()
@@ -147,7 +141,12 @@ collect_historical_data()
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
 
-# je vais mettre en place un cronjob pour lancer le script en arrière-plan
+# attente d'une seconde entre chaque jour pour éviter de surcharger l'API Binance
+# nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
+# et avoir une erreur au niveau du serveur de l'API
+# mise en pause de 1 minute entre chaque requete
+
+# un cronjob est créé pour lancer le script en arrière-plan
 # pour récupérer les données de la journée précédente
 # et les stocker dans MongoDB
 # pour les symboles et l'intervalle spécifiés.
@@ -155,4 +154,4 @@ collect_historical_data()
 # crontab - e
 # ajout de la ligne suivante pour exécuter le script toutes les secondes
 # execution de la commande toutes les secondes
-# python3 Application/extract_history.py
+# python3 ./extract/extract_history.py

@@ -7,5 +7,4 @@
 # docker-compose up --scale kafka=2 -d
 # pid=$!
 # wait $pid
-# CRON_CMD="* * * * * ./run_extract_history.sh"
 python3 ./extract/extract_history.py
