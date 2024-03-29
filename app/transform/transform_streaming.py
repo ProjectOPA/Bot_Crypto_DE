@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 from pymongo import MongoClient
 from sklearn.impute import SimpleImputer
 from app.transform.transform_history import train_linear_regression_model
