@@ -137,7 +137,7 @@ def collect_historical_data():
         # nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
         # et avoir une erreur au niveau du serveur de l'API
         # mise en pause de 1 seconde entre chaque jour
-        time.sleep(1)
+        # time.sleep(1)
 
 
 # appel de la fonction pour récupérer requeter et stocker les données historiques
