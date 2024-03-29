@@ -142,37 +142,17 @@ def train_linear_regression_model():
     print("valeurs manquantes dans y_test:")
     print(y_test.isna().sum())
 
-    # remplissage des valeurs manquantes dans les variables numériques
-    num_imputer = SimpleImputer(missing_values=np.nan, strategy="median")
-
-    X_train_imputed = pd.DataFrame(
-        num_imputer.fit_transform(X_train), columns=X_train.columns
-    )
-
-    X_test_imputed = pd.DataFrame(num_imputer.transform(X_test), columns=X_test.columns)
-
-    # affichage vérifications des valeurs manquantes numériques
-    print("valeurs manquantes numériques dans X_train:")
-    print(X_train_imputed.isna().sum())
-
-    print("valeurs manquantes numériques dans X_test:")
-    print(X_test_imputed.isna().sum())
-
     # il n'y a pas d'encodage à faire car il n'y a pas de variables catégorielles
-
-    # assignation des variables nettoyées
-    X_train_clean = X_train_imputed
-    X_test_clean = X_test_imputed
 
     # initialisation du modèle de régression linéaire
     regressor = LinearRegression()
 
     # entrainement du modèle de régression linéaire
-    regressor.fit(X_train_clean, y_train)
+    regressor.fit(X_train, y_train)
 
     # évaluation de la performance du modèle
-    train_r2 = regressor.score(X_train_clean, y_train)
-    test_r2 = regressor.score(X_test_clean, y_test)
+    train_r2 = regressor.score(X_train, y_train)
+    test_r2 = regressor.score(X_test, y_test)
 
     # affichage du coefficient de détermination R2 sur le jeu d'entraînement
     print("Coefficient de détermination du modèle sur train:", train_r2)
@@ -184,7 +164,7 @@ def train_linear_regression_model():
     fig = plt.figure(figsize=(10, 10))
 
     # instanciation de l'objet LinearRegression, apprentissage et prédiction
-    pred_test = regressor.predict(X_test_clean)
+    pred_test = regressor.predict(X_test)
 
     # création d'un nuage de points pour afficher les prédictions
     plt.scatter(pred_test, y_test, c="green")
