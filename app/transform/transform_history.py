@@ -1,9 +1,7 @@
 import pandas as pd
-import numpy as np
 import warnings
 from pymongo import MongoClient
 from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
@@ -71,34 +69,8 @@ def train_linear_regression_model():
     # récupération des données dans un DataFrame
     df = pd.DataFrame(list(collection.find()))
 
-    # affichage des 5 premières lignes
-    print(df.head())
-
-    # vérification des doublons
-    doublons = df.duplicated().sum()
-    print(f"le dataframe contient {doublons} doublons")
-
-    # vérification des valeurs manquantes
-    valeurs_manquantes = df.isna().sum()
-    print(f"le dataframe contient {valeurs_manquantes} valeurs manquantes")
-
-    # vérification des types de données
-    df.dtypes
-
-    # description des statistiques quantitatives
-    df.describe()
-
-    # calcul du nombre de modalité(valeurs différentes)pour chaque variable explicative
-    modalite_par_variable = df.nunique()
-
-    # affichage des modalités
-    print(modalite_par_variable)
-
     # calcul du taux de variation journalier entre le prix le plus haut et le prix le plus bas
     df["taux_variation"] = (df["high"] - df["low"]) / df["low"] * 100
-
-    # affichage des 5 premières lignes
-    df.head()
 
     # suppression des colonnes non nécessaires au machine learning
     df = df.drop(["timestamp", "_id", "symbol"], axis=1)
@@ -111,38 +83,6 @@ def train_linear_regression_model():
     X_train, X_test, y_train, y_test = train_test_split(
         feats, target, test_size=0.20, random_state=42
     )
-
-    # vérification des tailles du jeu de données
-    print("train Set:", X_train.shape)
-    print("test Set:", X_test.shape)
-
-    # vérification du type des variables
-    df.info()
-
-    # affichage des 5 premières lignes
-    print(df.head())
-
-    # il n'y a pas de variables catégorielles donc pas besoin de faire de séparation entre les variables numériques et catégorielles
-
-    # affichage vérifications des valeurs manquantes
-    # dans les jeux de données d'entraînement et de test
-    # des variables explicatives
-    print("valeurs manquantes dans X_train:")
-    print(X_train.isna().sum())
-
-    print("valeurs manquantes dans X_test:")
-    print(X_test.isna().sum())
-
-    # affichage vérifications des valeurs manquantes
-    # dans les jeux de données d'entraînement
-    # et de test de la cible
-    print("valeurs manquantes dans y_train:")
-    print(y_train.isna().sum())
-
-    print("valeurs manquantes dans y_test:")
-    print(y_test.isna().sum())
-
-    # il n'y a pas d'encodage à faire car il n'y a pas de variables catégorielles
 
     # initialisation du modèle de régression linéaire
     regressor = LinearRegression()
