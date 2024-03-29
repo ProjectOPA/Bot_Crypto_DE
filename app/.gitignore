@@ -4,8 +4,5 @@
 # ignorer le répertoire .venv
 *.venv/
 
-# ignorer les fichiers de configuration spécifiques
-.config.ini
-
 # ignorer tout le répertoire data
 *.data/
