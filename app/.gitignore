@@ -7,5 +7,5 @@
 # ignorer tout le répertoire data
 *.data/
 
-# ignorer les fichiers de pytest
+# ignorer le répertoire de pytest
 *.pytest_cache/
