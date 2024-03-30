@@ -1,3 +1,9 @@
+# 1. step1_extract : Extraction des données
+# - Cette étape consiste à extraire les données brutes à partir  l'API Binance
+#     - extraction des données historiques
+#     - extraction des données de streamings
+#     - stockage des données historiques dans le dossier .data
+
 # importation des librairies nécessaires
 # requests de python pour effectuer des requêtes HTTP
 import requests
@@ -7,9 +13,6 @@ from pymongo import MongoClient
 
 # datetime pour manipuler des objets datetime
 from datetime import datetime, timedelta
-
-
-import time
 
 # authentification à MongoDB
 # définition des informations d'identification nécessaires
@@ -141,7 +144,7 @@ collect_historical_data()
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
 
-# attente d'une seconde entre chaque jour pour éviter de surcharger l'API Binance
+# attente d'une minute entre chaque jour pour éviter de surcharger l'API Binance
 # nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
 # et avoir une erreur au niveau du serveur de l'API
 # mise en pause de 1 minute entre chaque requete
@@ -151,7 +154,7 @@ collect_historical_data()
 # et les stocker dans MongoDB
 # pour les symboles et l'intervalle spécifiés.
 # configuration du cronjob dans le fichier crontab
-# crontab - e
+# crontab -e
 # ajout de la ligne suivante pour exécuter le script toutes les secondes
 # execution de la commande toutes les secondes
 # python3 ./extract/extract_history.py
