@@ -1,35 +1,11 @@
 from fastapi import FastAPI
-from extract.extract_history import collect_historical_data
-from transform.transform_history import transform_historical_data
-from modeling.modeling_history_transformed import (
-    train_linear_regression_model as train_lr_model,
-)
-
 
 app = FastAPI()
 
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/collect_historical_data")
-def collect_data():
-    collect_historical_data()
-    return {"message": "Data collected"}
-
-
-@app.get("/transform_historical_data")
-def transform_data():
-    transform_historical_data()
-    return {"message": "Data transformed"}
-
-
-@app.get("/train_linear_regression_model")
-def train_model():
-    train_lr_model()
-    return {"message": "Model trained"}
+def get_home():
+    return {"msg": "Hello World"}
 
 
 # exécution de l'API FastAPI
