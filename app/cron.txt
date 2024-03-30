@@ -1,5 +1,5 @@
 ####crontab job###
-# s'assurez que le fichier cron.txt se termine par une nouvelle ligne après la dernière ligne de commande
+# s'assurer que le fichier cron.txt se termine par une nouvelle ligne après la dernière ligne de commande
 # cela permettra au crontab de s'executer
 # execution de la commande toutes les minutes
 */60 * * * * ~/conf.sh
