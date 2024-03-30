@@ -126,4 +126,4 @@ def train_linear_regression_model():
     return regressor
 
 
-train_linear_regression_model()
+# train_linear_regression_model()

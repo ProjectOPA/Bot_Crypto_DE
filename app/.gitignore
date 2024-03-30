@@ -6,3 +6,6 @@
 
 # ignorer tout le répertoire data
 *.data/
+
+# ignorer le répertoire de pytest
+*.pytest_cache/
