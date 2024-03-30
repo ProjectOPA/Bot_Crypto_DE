@@ -1,5 +1,6 @@
 # 4. step4_modeling : Machine Learning (Apprentissage automatique)
-#     - construction du modèle (séparation de la variable cible des variables explicatives, séparation du jeu d'entraînement et du jeu de test)
+#     - construction du modèle (séparation de la variable cible des variables explicatives,
+#       séparation du jeu d'entraînement et du jeu de test)
 #     - entrainement du modèle
 #     - évaluation du modèle
 #     - test du modèle sur les données de streaming
