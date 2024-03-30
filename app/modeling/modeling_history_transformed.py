@@ -1,9 +1,12 @@
+# 4. step4_modeling : Machine Learning (Apprentissage automatique)
+#     - construction du modèle (séparation de la variable cible des variables explicatives, séparation du jeu d'entraînement et du jeu de test)
+#     - entrainement du modèle
+#     - évaluation du modèle
+#     - test du modèle sur les données de streaming
 import pandas as pd
-import numpy as np
 import warnings
 from pymongo import MongoClient
 from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
@@ -17,8 +20,9 @@ mongo_port = 27017
 client = MongoClient(
     f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/"
 )
-db = client["extract_data_binance"]
-collection = db["historical_data"]
+
+db_transformed = client["transform_data_binance"]
+collection_history_transformed = db_transformed["historical_data_transformed"]
 
 
 # définition d'une fonction pour entraîner un modèle de régression linéaire
@@ -58,27 +62,22 @@ def train_linear_regression_model():
     - test_r2 (float): Le coefficient de détermination R2 du modèle sur l'ensemble de test.
 
     Cette fonction se connecte à une base de données MongoDB,
-    récupère les données historiques de prix,
-    calcule le taux de variation journalier,
-    effectue le nettoyage des données,
-    divise le jeu de données en ensembles d'entraînement et de test,
-    remplit les valeurs manquantes,
+    récupère les données historiques transformées,
     entraîne un modèle de régression linéaire,
     évalue sa performance sur les ensembles d'entraînement et de test,
     et affiche un nuage de points pour visualiser les prédictions du modèle.
 
     """
     # récupération des données dans un DataFrame
-    df = pd.DataFrame(list(collection.find()))
+    df = pd.DataFrame(list(collection_history_transformed.find()))
 
-    # calcul du taux de variation journalier entre le prix le plus haut et le prix le plus bas
-    df["taux_variation"] = (df["high"] - df["low"]) / df["low"] * 100
-
-    # suppression des colonnes non nécessaires au machine learning
-    df = df.drop(["timestamp", "_id", "symbol"], axis=1)
+    # affichage des 5 premières lignes du DataFrame
+    print(df.head())
 
     # séparation de la variable cible des variables explicatives
-    feats = df.drop("close", axis=1)
+    # il est nécessaire de supprimer la colonne "_id" qui est un objet de type ObjectId de MongoDB
+    # pour éviter une erreur lors de l'entraînement du modèle
+    feats = df.drop(["close", "_id"], axis=1)
     target = df["close"]
 
     # séparation du jeu d'entraînement et du jeu de test
@@ -86,42 +85,44 @@ def train_linear_regression_model():
         feats, target, test_size=0.20, random_state=42
     )
 
-    # remplissage des valeurs manquantes dans les variables numériques
-    num_imputer = SimpleImputer(missing_values=np.nan, strategy="median")
-    X_train_imputed = pd.DataFrame(
-        num_imputer.fit_transform(X_train), columns=X_train.columns
-    )
-    X_test_imputed = pd.DataFrame(num_imputer.transform(X_test), columns=X_test.columns)
-
     # initialisation du modèle de régression linéaire
     regressor = LinearRegression()
 
-    # entraînement du modèle de régression linéaire
-    regressor.fit(X_train_imputed, y_train)
+    # entrainement du modèle de régression linéaire
+    regressor.fit(X_train, y_train)
 
     # évaluation de la performance du modèle
-    train_r2 = regressor.score(X_train_imputed, y_train)
-    test_r2 = regressor.score(X_test_imputed, y_test)
+    train_r2 = regressor.score(X_train, y_train)
+    test_r2 = regressor.score(X_test, y_test)
 
-    # # affichage du coefficient de détermination R2 sur le jeu d'entraînement
-    # print("Coefficient de détermination du modèle sur train:", train_r2)
+    # affichage du coefficient de détermination R2 sur le jeu d'entraînement
+    print("Coefficient de détermination du modèle sur train:", train_r2)
 
-    # # affichage du coefficient de détermination R2 sur le jeu de test
-    # print("Coefficient de détermination du modèle sur test:", test_r2)
+    # affichage du coefficient de détermination R2 sur le jeu de test
+    print("Coefficient de détermination du modèle sur test:", test_r2)
 
-    # visualisation des prédictions
+    # création d'une figure pour afficher le nuage de points
     fig = plt.figure(figsize=(10, 10))
-    pred_test = regressor.predict(X_test_imputed)
+
+    # instanciation de l'objet LinearRegression, apprentissage et prédiction
+    pred_test = regressor.predict(X_test)
+
+    # création d'un nuage de points pour afficher les prédictions
     plt.scatter(pred_test, y_test, c="green")
+
+    # affichage de la droite d'équation y = x par dessus le nuage de points
     plt.plot((y_test.min(), y_test.max()), (y_test.min(), y_test.max()), color="red")
+
+    # ajout de titre et de labels
     plt.xlabel("prediction")
     plt.ylabel("vraie valeur")
     plt.title("régression linéaire pour la prédiction du prix de clôture")
+
+    # affichage du graphique
     plt.show()
 
-    # retourne le modèle entraîné et ses performances
-    return regressor, train_r2, test_r2
+    # retourne le modèle entraîné
+    return regressor
 
 
-# exemple d'utilisation de la fonction
-trained_model, train_r2, test_r2 = train_linear_regression_model()
+train_linear_regression_model()

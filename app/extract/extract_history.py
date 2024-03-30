@@ -1,3 +1,9 @@
+# 1. step1_extract : Extraction des données
+# - Cette étape consiste à extraire les données brutes à partir  l'API Binance
+#     - extraction des données historiques
+#     - extraction des données de streamings
+#     - stockage des données historiques dans le dossier .data
+
 # importation des librairies nécessaires
 # requests de python pour effectuer des requêtes HTTP
 import requests
@@ -7,9 +13,6 @@ from pymongo import MongoClient
 
 # datetime pour manipuler des objets datetime
 from datetime import datetime, timedelta
-
-
-import time
 
 # authentification à MongoDB
 # définition des informations d'identification nécessaires
@@ -32,6 +35,16 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
+
+# Dans le contexte du trading financier,
+# une bougie (candlestick ou candle en anglais)
+# est une représentation graphique d'une unité de temps spécifique
+# (comme une minute, une heure, un jour, etc.)
+# des mouvements de prix d'un actif financier,
+# tel qu'une paire de devises,
+# une action ou une crypto-monnaie.
+
+
 # URL de l'API Binance pour les données historiques klines (candles)
 api_url = "https://api.binance.com/api/v3/klines"
 
@@ -44,7 +57,8 @@ interval = "2h"
 
 
 # définition d'une fonction
-# pour obtenir des données historiques depuis l'API Binance
+# pour requeter des données historiques depuis l'API Binance
+# selon le shéma de requête donné par l'API
 def get_binance_data(symbol, interval, start_date, end_date):
     params = {
         "symbol": symbol,
@@ -57,17 +71,8 @@ def get_binance_data(symbol, interval, start_date, end_date):
     return data
 
 
-# Dans le contexte du trading financier,
-# une bougie (candlestick ou candle en anglais)
-# est une représentation graphique d'une unité de temps spécifique
-# (comme une minute, une heure, un jour, etc.)
-# des mouvements de prix d'un actif financier,
-# tel qu'une paire de devises,
-# une action ou une crypto-monnaie.
-
-
 # définition d'une fonction
-# pour stocker les données dans MongoDB
+# pour stocker la réponse de la requete dans MongoDB
 def store_in_mongodb(data, symbol):
     # création d'une boucle pour parcourir chaque bougie (candle)
     # dans les données récupérées de l'API Binance
@@ -107,7 +112,7 @@ def store_in_mongodb(data, symbol):
         collection.insert_one(candle_data)
 
 
-# définition de la fonction pour récupérer les données historiques
+# définition de la fonction pour executer la fonction de requete et de stockage
 def collect_historical_data():
     # détermination de la date d'aujourd'hui
     end_date = datetime.now()
@@ -131,28 +136,25 @@ def collect_historical_data():
         # incrémentation pour passage au jour suivant
         start_date += timedelta(days=1)
 
-        # attente d'une seconde entre chaque jour pour éviter de surcharger l'API Binance
-        # nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
-        # et avoir une erreur au niveau du serveur de l'API
-        # mise en pause de 1 seconde entre chaque jour
-        time.sleep(1)
 
-
-# point d'entrée du script
-if __name__ == "__main__":
-    # Appel à la fonction pour collecter les données historiques
-    collect_historical_data()
+# appel de la fonction pour récupérer requeter et stocker les données historiques
+collect_historical_data()
 
 
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
 
-# je vais mettre en place un cronjob pour lancer le script en arrière-plan
+# attente d'une minute entre chaque jour pour éviter de surcharger l'API Binance
+# nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
+# et avoir une erreur au niveau du serveur de l'API
+# mise en pause de 1 minute entre chaque requete
+
+# un cronjob est créé pour lancer le script en arrière-plan
 # pour récupérer les données de la journée précédente
 # et les stocker dans MongoDB
 # pour les symboles et l'intervalle spécifiés.
 # configuration du cronjob dans le fichier crontab
-# crontab - e
+# crontab -e
 # ajout de la ligne suivante pour exécuter le script toutes les secondes
 # execution de la commande toutes les secondes
-# python3 Application/extract_history.py
+# python3 ./extract/extract_history.py
