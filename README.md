@@ -36,8 +36,6 @@ Crypto bot pour projet de Data Engineer
 
 5. step5_load : Load (Chargement des résultats du modèle dans une bd)
     - sauvegarde des prédictions
-    - sauvegarde des métriques d'évaluation
-    - sauvegarde des résultats d'analyse
 
 #### s'assurez-vous que le service Docker est en cours d'exécution sur votre système. Vous pouvez démarrer le service Docker en utilisant la commande suivante :
 pip install --upgrade docker-compose
