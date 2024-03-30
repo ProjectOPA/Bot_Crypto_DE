@@ -1,7 +1,6 @@
 # 1. step1_extract : Extraction des données
 # - Cette étape consiste à extraire les données brutes à partir  l'API Binance
 #     - extraction des données historiques
-#     - extraction des données de streamings
 #     - stockage des données historiques dans le dossier .data
 
 # importation des librairies nécessaires
