@@ -1,3 +1,9 @@
+# 2. step2_transform : Transformation (pré-processing)
+# - Une fois les données extraites, cette étape consiste à transformer les données extraites
+#  (gestion des valeurs manquantes, création de nouvelles colonnes, normalisation..)
+#   pour l'analyse et le traitement par le modèle de Machine Learning.
+#     - transformation des données historiques stockées
+
 import pandas as pd
 import numpy as np
 from pymongo import MongoClient
