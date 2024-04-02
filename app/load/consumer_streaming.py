@@ -15,8 +15,8 @@ mongo_conf = {
     "password": "pass",
     "host": "localhost",  # Adresse de l'hôte MongoDB
     "port": 27017,  # Port MongoDB
-    "database": "extract_data_binance",  # Nom de la base de données MongoDB
-    "collection": "streaming_data",  # Nom de la collection MongoDB
+    "database": "streaming_data",  # Nom de la base de données MongoDB
+    "collection": "streaming_data_predict",  # Nom de la collection MongoDB
 }
 
 # Création du consommateur Kafka
@@ -52,7 +52,8 @@ try:
         else:
             # Insertion du message dans la base de données MongoDB
             data = json.loads(msg.value().decode("utf-8"))
-            streaming_data_predict.insert_one(data)
+            collection.insert_one(data)
+
             print("Message inséré dans MongoDB:", data)
 
 finally:
