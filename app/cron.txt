@@ -1,1 +1,3 @@
-0 0 * * * python3 ~/OneDrive/Bureau/projet/Bot_Crypto_DE/app/extract/extract_history.py && python3 ~/OneDrive/Bureau/projet/Bot_Crypto_DE/app/transform/transform_history.py
+#execution des scripts tous les jours à 00h00
+
+0 0 * * * python3 ~/Bot_Crypto_DE/app/extract/extract_history.py && python3 ~/Bot_Crypto_DE/app/transform/transform_history.py
