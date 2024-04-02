@@ -14,12 +14,12 @@ import json
 
 # Ajout du dossier app/ pour que python puisse lire les paquets
 script_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(script_dir, '..'))
+sys.path.append(os.path.join(script_dir, ".."))
 
 # Import du modèle
 from modeling.modeling_history_transformed import train_linear_regression_model
 
-#Instanciation du modèle de regression entraînée
+# Instanciation du modèle de regression entraînée
 regressor = train_linear_regression_model()
 
 kafka_conf = {"bootstrap.servers": "localhost:9092"}
@@ -43,9 +43,15 @@ async def main():
 
             # S'assure que la donnée reçu correspond bien à celle de la fermeture de la k_line afin de respecter les 5MIN d'interval
             if res["k"]["x"]:
+
                 # Envoi des données au topic Kafka
                 producer.produce("BTCUSDT_topic", json.dumps(res))
                 producer.poll(0)  # Appel poll pour s'assurer que le message est envoyé
+
+                # utilisation du modèle de regression pour prédire le prix de clôture
+                # et affichage des données
+                res["k"]["x"] = False
+                res["k"]["c"] = regressor.predict(pd.DataFrame([res["k"]]))[0]
 
                 # Affichage des données pour vérification
                 print(res)
