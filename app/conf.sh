@@ -7,4 +7,4 @@
 # docker-compose up --scale kafka=2 -d
 # pid=$!
 # wait $pid
-python3 ./extract/extract_history.py
+
