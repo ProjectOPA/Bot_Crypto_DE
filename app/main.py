@@ -8,6 +8,11 @@ def get_home():
     return {"msg": "Hello World"}
 
 
+@app.get("/predict")
+def get_predict():
+    pass
+
+
 # exécution de l'API FastAPI
 # lorsque le script est exécuté en tant que programme principal
 if __name__ == "__main__":
