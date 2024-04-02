@@ -44,14 +44,14 @@ async def main():
             # S'assure que la donnée reçu correspond bien à celle de la fermeture de la k_line afin de respecter les 5MIN d'interval
             if res["k"]["x"]:
 
-                # Envoi des données au topic Kafka
-                producer.produce("BTCUSDT_topic", json.dumps(res))
-                producer.poll(0)  # Appel poll pour s'assurer que le message est envoyé
-
                 # utilisation du modèle de regression pour prédire le prix de clôture
                 # et affichage des données
                 res["k"]["x"] = False
                 res["k"]["c"] = regressor.predict(pd.DataFrame([res["k"]]))[0]
+
+                # Envoi des données au topic Kafka
+                producer.produce("BTCUSDT_topic", json.dumps(res))
+                producer.poll(0)  # Appel poll pour s'assurer que le message est envoyé
 
                 # Affichage des données pour vérification
                 print(res)
