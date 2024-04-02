@@ -3,12 +3,24 @@
 #     - extraction des données de streamings
 
 from confluent_kafka import Producer
+import sys
+import os
 import pandas as pd
 import asyncio
 from binance.client import AsyncClient
 from binance import BinanceSocketManager
 from binance.enums import *
 import json
+
+# Ajout du dossier app/ pour que python puisse lire les paquets
+script_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(script_dir, '..'))
+
+# Import du modèle
+from modeling.modeling_history_transformed import train_linear_regression_model
+
+#Instanciation du modèle de regression entraînée
+regressor = train_linear_regression_model()
 
 kafka_conf = {"bootstrap.servers": "localhost:9092"}
 
@@ -17,8 +29,6 @@ producer = Producer(kafka_conf)
 
 
 async def main():
-    api_key = "mVJMDUgghiBBlgQTW73iB5PQJMtU32qny0eFWRnEAfh5VSsa4lgDXWSZhujuQXZ6"
-    api_secret = "rHMU91gAKVQvD34HMKFm1HxKUbWjnhwWI7qKtPTqH5JmkgcrNaNgyVUVt1N9HLok"
 
     client = await AsyncClient.create()
     bm = BinanceSocketManager(client)

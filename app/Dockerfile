@@ -77,7 +77,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 CMD ["/opt/kafka/bin/kafka-server-start.sh", "/opt/kafka/config/server.properties"]
 
 # changement du répertoire de travail
-WORKDIR /app/Application
+WORKDIR /app/extract
 
 # commande par défaut à exécuter lorsque le conteneur démarre
 CMD [ "python3", "extract_history.py" ]

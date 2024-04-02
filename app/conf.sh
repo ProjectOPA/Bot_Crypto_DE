@@ -7,4 +7,3 @@
 # docker-compose up --scale kafka=2 -d
 # pid=$!
 # wait $pid
-
