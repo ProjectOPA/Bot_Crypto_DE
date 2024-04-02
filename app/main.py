@@ -7,7 +7,10 @@ app = FastAPI()
 def get_home():
     return {"msg": "Hello World"}
 
-
+@app.get("/history")
+def get_predict():
+    pass
+    
 @app.get("/predict")
 def get_predict():
     pass
