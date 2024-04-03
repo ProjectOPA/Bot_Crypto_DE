@@ -1,3 +1,6 @@
+# step5_load : Load (Chargement des résultats du modèle dans une bd)
+#     - sauvegarde des prédictions
+
 from confluent_kafka import Consumer, KafkaError
 from pymongo import MongoClient
 import json
