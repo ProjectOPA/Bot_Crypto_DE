@@ -114,6 +114,7 @@ async def get_prediction(
 
 
 # exécution de l'API FastAPI
+# lorsque le script est exécuté en tant que programme principal
 if __name__ == "__main__":
     import uvicorn
 
