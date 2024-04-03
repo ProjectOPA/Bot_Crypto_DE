@@ -69,16 +69,15 @@ def train_linear_regression_model():
     df = df.drop(["_id", "taux_variation"], axis=1)
 
     # Création de la variable cible next_close qui correspond à la valeure suivante de la crypto
-    df['next_close']= df['close'].shift(-1)
+    df["next_close"] = df["close"].shift(-1)
 
     # Suppression des lignes avec valeurs manquantes (1 seule valeur manquante dans notre cas d'espèces)
     df = df.dropna()
     # séparation du jeu d'entraînement et du jeu de test
 
-    #Separation des variable feats et de la variable cible à prédire
-    feats = df.drop("next_close",axis=1)
-    target = df['next_close']
-
+    # Separation des variable feats et de la variable cible à prédire
+    feats = df.drop("next_close", axis=1)
+    target = df["next_close"]
 
     X_train, X_test, y_train, y_test = train_test_split(
         feats, target, test_size=0.20, random_state=42
@@ -91,11 +90,14 @@ def train_linear_regression_model():
     regressor.fit(X_train, y_train)
 
     # évaluation de la performance du modèle
-    print('score sur test:', regressor.score(X_test, y_test))
+    print("score sur test:", regressor.score(X_test, y_test))
 
-    print('score sur train:', regressor.score(X_train, y_train))
+    print("score sur train:", regressor.score(X_train, y_train))
 
     return regressor
 
 
-# train_linear_regression_model()
+# si le script est exécuté directement en ligne de commande (et non importé en tant que module)
+if __name__ == "__main__":
+    # appel de la fonction pour entraîner le modèle de régression linéaire
+    model = train_linear_regression_model()
