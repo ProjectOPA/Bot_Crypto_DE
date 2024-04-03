@@ -34,7 +34,7 @@ async def main():
     bm = BinanceSocketManager(client)
 
     # Création du socket d'écoute sur les klines du BTCUSDT
-    ks = bm.kline_socket("BTCUSDT", interval=KLINE_INTERVAL_5MINUTE)
+    ks = bm.kline_socket("BTCUSDT", interval=KLINE_INTERVAL_1MINUTE)
 
     # Réception permanente du message
     async with ks as tscm:
@@ -44,17 +44,33 @@ async def main():
             # S'assure que la donnée reçu correspond bien à celle de la fermeture de la k_line afin de respecter les 5MIN d'interval
             if res["k"]["x"]:
 
-                # utilisation du modèle de regression pour prédire le prix de clôture
-                # et affichage des données
-                res["k"]["x"] = False
-                res["k"]["c"] = regressor.predict(pd.DataFrame([res["k"]]))[0]
+                # modelisation de la donnée pour correspondre au schéma de prédiction 
+                streamed = {"open": float(res["k"]["o"]),
+                            "high": float(res["k"]["h"]),
+                            "low": float(res["k"]["l"]),
+                            "close": float(res["k"]["c"]),
+                            "volume": float(res["k"]["v"])
+                            }
+                
+                streamed_df = pd.DataFrame([streamed])
+
+                # utilisation du modèle de regression pour prédire le prochain prix de clotûre
+                next_close = regressor.predict(streamed_df)
+
+                streamed_final = {"open": float(res["k"]["o"]),
+                            "high": float(res["k"]["h"]),
+                            "low": float(res["k"]["l"]),
+                            "close": float(res["k"]["c"]),
+                            "volume": float(res["k"]["v"]),
+                            "next_close": next_close[0]
+                            }
 
                 # Envoi des données au topic Kafka
-                producer.produce("BTCUSDT_topic", json.dumps(res))
+                producer.produce("BTCUSDT_topic", json.dumps(streamed_final))
                 producer.poll(0)  # Appel poll pour s'assurer que le message est envoyé
 
                 # Affichage des données pour vérification
-                print(res)
+                print(streamed_final)
 
 
 if __name__ == "__main__":

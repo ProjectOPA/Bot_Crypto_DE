@@ -27,8 +27,8 @@ uri = f"mongodb://{mongo_conf['user']}:{mongo_conf['password']}@{mongo_conf['hos
 
 # Connexion à la base de données MongoDB
 client = MongoClient(uri)
-db = client[mongo_conf["streaming_data"]]
-collection = db[mongo_conf["streaming_data_predict"]]
+db = client[mongo_conf["database"]]
+collection = db[mongo_conf["collection"]]
 
 # Abonnement au topic BTCUSDT_topic
 consumer.subscribe(["BTCUSDT_topic"])
