@@ -60,4 +60,7 @@ def transform_historical_data():
     )
 
 
-transform_historical_data()
+# si le script est exécuté directement en ligne de commande (et non importé en tant que module)
+if __name__ == "__main__":
+    # appel de la fonction pour transformer les données historiques
+    transform_historical_data()

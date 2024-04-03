@@ -136,9 +136,10 @@ def collect_historical_data():
         start_date += timedelta(days=1)
 
 
-# appel de la fonction pour récupérer requeter et stocker les données historiques
-collect_historical_data()
-
+# si le script est exécuté directement en ligne de commande (et non importé en tant que module)
+if __name__ == "__main__":
+    # appel de la fonction pour récupérer les données historiques
+    collect_historical_data()
 
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
