@@ -10,7 +10,7 @@ from mongo_queries import (
 
 # définition de l'application FastAPI
 app = FastAPI(
-    title="API request historical data and predictions",
+    title="API de requête sur les données historiques et de prédictions stockées dans MongoDB",
     version="1.0.0",
     openapi_tags=[
         {"name": "home", "description": "page d'accueil de l'API"},
