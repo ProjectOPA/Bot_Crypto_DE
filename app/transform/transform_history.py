@@ -22,17 +22,19 @@ collection = db["historical_data"]
 db_transformed = client["transform_data_binance"]
 collection_history_transformed = db_transformed["historical_data_transformed"]
 
-# création de l'index TTL de 24 heures (en secondes), nous indiquons à MongoDB de
-# supprimer automatiquement les documents de la collection
-# après 24 heures à compter de la valeur du champ timestamp.
-collection_history_transformed.create_index("timestamp", expireAfterSeconds=86400)
-
 
 # définition d'une fonction pour transformer les données historiques
 def transform_historical_data():
     """
+    Description:
+    - Suppression des documents existants dans la collection "historical_data_transformed"
+    - Récupération des données historiques de prix
+    - Transformation des données historiques de prix
     - Calcul des variations journalières des données historiques entre le prix le plus haut et le prix le plus bas
     pour chaque jour afin de mesurer la volatilité du marché dans le but de prédire le prix à la fermeture de chaque bougie.
+
+    Arguments:
+    - aucun argument n'est requis
 
     Returns:
     - stock le résultat dans une nouvelle collection nommée "historical_data_transformed"
@@ -44,6 +46,10 @@ def transform_historical_data():
     et stocke le résultat dans une nouvelle collection
 
     """
+    # suppression de tous les documents existants dans la collection
+    # pour éviter les doublons de données
+    collection_history_transformed.delete_many({})
+
     # récupération des données dans un DataFrame
     df = pd.DataFrame(list(collection.find()))
 

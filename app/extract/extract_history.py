@@ -34,10 +34,6 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
-# création de l'index TTL de 24 heures (en secondes), nous indiquons à MongoDB de
-# supprimer automatiquement les documents de la collection
-# après 24 heures à compter de la valeur du champ timestamp.
-collection.create_index("timestamp", expireAfterSeconds=86400)
 
 # Dans le contexte du trading financier,
 # une bougie (candlestick ou candle en anglais)
@@ -63,6 +59,21 @@ interval = "2h"
 # pour requeter des données historiques depuis l'API Binance
 # selon le shéma de requête donné par l'API
 def get_binance_data(symbol, interval, start_date, end_date):
+    """
+    Description:
+    - Récupération des données historiques pour un symbole spécifié
+    sur une période de temps spécifiée
+
+    Args:
+    - symbol: le symbole de la paire de trading pour laquelle les données sont collectées
+    - interval: l'intervalle de temps pour lequel les données sont collectées
+    - start_date: la date de début pour laquelle les données sont collectées
+    - end_date: la date de fin pour laquelle les données sont collectées
+
+    Returns:
+    - les données historiques pour un symbole spécifié
+    sur une période de temps spécifiée
+    """
     params = {
         "symbol": symbol,
         "interval": interval,
@@ -77,6 +88,19 @@ def get_binance_data(symbol, interval, start_date, end_date):
 # définition d'une fonction
 # pour stocker la réponse de la requete dans MongoDB
 def store_in_mongodb(data, symbol):
+    """
+    Description:
+    - Stockage des données historiques dans MongoDB
+
+    Args:
+    - data: les données historiques pour un symbole spécifié
+    sur une période de temps spécifiée
+    - symbol: le symbole de la paire de trading pour laquelle les données sont collectées
+
+    Returns:
+    - stocke les données dans une collection nommée "historical_data"
+    """
+
     # création d'une boucle pour parcourir chaque bougie (candle)
     # dans les données récupérées de l'API Binance
     for candle in data:
@@ -122,6 +146,25 @@ def store_in_mongodb(data, symbol):
 
 # définition de la fonction pour executer la fonction de requete et de stockage
 def collect_historical_data():
+    """
+    Description:
+    - Suppression de tous les documents existants dans la collection
+    - Récupération des données historiques pour les symboles spécifiés
+    sur une période de 4 ans et stockage des données dans MongoDB
+
+    Arguments:
+    - aucun argument n'est requis
+
+    Returns:
+    - tant que la date de début est inférieure ou égale à la date de fin,
+    les données historiques sont récupérées pour chaque jour
+    et stockées dans MongoDB
+
+    """
+    # suppression de tous les documents existants dans la collection
+    # pour éviter les doublons de données
+    collection.delete_many({})
+
     # détermination de la date d'aujourd'hui
     end_date = datetime.now()
 
