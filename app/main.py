@@ -10,7 +10,7 @@ from mongo_queries import (
 
 # définition de l'application FastAPI
 app = FastAPI(
-    title="API request historical data and predictions",
+    title="API de requête sur les données historiques et de prédictions stockées dans MongoDB",
     version="1.0.0",
     openapi_tags=[
         {"name": "home", "description": "page d'accueil de l'API"},
@@ -121,4 +121,4 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 # exécution de l'API Fastapi dans le terminal
-# uvicorn main:app --reload ou python main.py
+# uvicorn main:app --reload ou python3 main.py

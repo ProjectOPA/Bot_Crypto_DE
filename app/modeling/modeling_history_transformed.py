@@ -30,16 +30,11 @@ collection_history_transformed = db_transformed["historical_data_transformed"]
 def train_linear_regression_model():
     warnings.filterwarnings("ignore")
     """
-    - Entraîne un modèle de régression linéaire pour prédire le prix de clôture à partir des données stockées dans MongoDB.
-
-    - Étude des variations journalière des données historiques entre le prix le plus haut et le prix le plus bas
-    pour chaque jour afin de mesurer la volatilité du marché dans le but de prédire le prix à la fermeture de chaque bougie.
+    - Entraîne un modèle de régression linéaire pour prédire le prix de clôture suivant à partir des données stockées dans MongoDB.
 
         - utilisation de méthode de régression linéaire de l'apprentissage supervisé
 
-        - calcule de la variation entre le prix le plus haut et le plus bas pour chaque période de temps (chaque bougie dans notre cas)
-
-        - utilisation de la variable 'close' comme valeur cible(étiquette) dans les données d'apprentissage supervisé
+        - utilisation de la variable 'next_close' comme valeur cible(étiquette) dans les données d'apprentissage supervisé
 
     - Définition des valeurs explicatives (caractéristiques)
 
@@ -55,33 +50,35 @@ def train_linear_regression_model():
 
     - Définition de la valeur cible (étiquette)
 
-        - La valeur cible sera la variable 'close' indiquant le prix de fermeture
+        - La valeur cible sera la variable 'next_close' indiquant le prix de fermeture de la bougie suivantes.
 
     Returns:
     - regressor (LinearRegression): Le modèle de régression linéaire entraîné.
-    - train_r2 (float): Le coefficient de détermination R2 du modèle sur l'ensemble d'entraînement.
-    - test_r2 (float): Le coefficient de détermination R2 du modèle sur l'ensemble de test.
 
     Cette fonction se connecte à une base de données MongoDB,
     récupère les données historiques transformées,
     entraîne un modèle de régression linéaire,
-    évalue sa performance sur les ensembles d'entraînement et de test,
-    et affiche un nuage de points pour visualiser les prédictions du modèle.
+    évalue sa performance sur les ensembles d'entraînement et de test.
 
     """
     # récupération des données dans un DataFrame
     df = pd.DataFrame(list(collection_history_transformed.find()))
 
-    # affichage des 5 premières lignes du DataFrame
-    print(df.head())
-
-    # séparation de la variable cible des variables explicatives
     # il est nécessaire de supprimer la colonne "_id" qui est un objet de type ObjectId de MongoDB
-    # pour éviter une erreur lors de l'entraînement du modèle
-    feats = df.drop(["close", "_id"], axis=1)
-    target = df["close"]
+    # pour éviter une erreur lors de l'entraînement du modèle. Nous supprimons également la variable taux de variation, issue d'un calcul sur les données existantes et donc génératrive de biais
+    df = df.drop(["_id", "taux_variation"], axis=1)
 
+    # Création de la variable cible next_close qui correspond à la valeure suivante de la crypto
+    df["next_close"] = df["close"].shift(-1)
+
+    # Suppression des lignes avec valeurs manquantes (1 seule valeur manquante dans notre cas d'espèces)
+    df = df.dropna()
     # séparation du jeu d'entraînement et du jeu de test
+
+    # Separation des variable feats et de la variable cible à prédire
+    feats = df.drop("next_close", axis=1)
+    target = df["next_close"]
+
     X_train, X_test, y_train, y_test = train_test_split(
         feats, target, test_size=0.20, random_state=42
     )
@@ -93,37 +90,14 @@ def train_linear_regression_model():
     regressor.fit(X_train, y_train)
 
     # évaluation de la performance du modèle
-    train_r2 = regressor.score(X_train, y_train)
-    test_r2 = regressor.score(X_test, y_test)
+    print("score sur test:", regressor.score(X_test, y_test))
 
-    # affichage du coefficient de détermination R2 sur le jeu d'entraînement
-    print("Coefficient de détermination du modèle sur train:", train_r2)
+    print("score sur train:", regressor.score(X_train, y_train))
 
-    # affichage du coefficient de détermination R2 sur le jeu de test
-    print("Coefficient de détermination du modèle sur test:", test_r2)
-
-    # création d'une figure pour afficher le nuage de points
-    fig = plt.figure(figsize=(10, 10))
-
-    # instanciation de l'objet LinearRegression, apprentissage et prédiction
-    pred_test = regressor.predict(X_test)
-
-    # création d'un nuage de points pour afficher les prédictions
-    plt.scatter(pred_test, y_test, c="green")
-
-    # affichage de la droite d'équation y = x par dessus le nuage de points
-    plt.plot((y_test.min(), y_test.max()), (y_test.min(), y_test.max()), color="red")
-
-    # ajout de titre et de labels
-    plt.xlabel("prediction")
-    plt.ylabel("vraie valeur")
-    plt.title("régression linéaire pour la prédiction du prix de clôture")
-
-    # affichage du graphique
-    plt.show()
-
-    # retourne le modèle entraîné
     return regressor
 
 
-# train_linear_regression_model()
+# si le script est exécuté directement en ligne de commande (et non importé en tant que module)
+if __name__ == "__main__":
+    # appel de la fonction pour entraîner le modèle de régression linéaire
+    model = train_linear_regression_model()
