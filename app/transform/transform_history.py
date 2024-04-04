@@ -26,8 +26,12 @@ collection_history_transformed = db_transformed["historical_data_transformed"]
 # définition d'une fonction pour transformer les données historiques
 def transform_historical_data():
     """
+    Description:
     - Calcul des variations journalières des données historiques entre le prix le plus haut et le prix le plus bas
     pour chaque jour afin de mesurer la volatilité du marché dans le but de prédire le prix à la fermeture de chaque bougie.
+
+    Arguments:
+    - aucun argument n'est requis
 
     Returns:
     - stock le résultat dans une nouvelle collection nommée "historical_data_transformed"
