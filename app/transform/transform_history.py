@@ -27,6 +27,9 @@ collection_history_transformed = db_transformed["historical_data_transformed"]
 def transform_historical_data():
     """
     Description:
+    - Suppression des documents existants dans la collection "historical_data_transformed"
+    - Récupération des données historiques de prix
+    - Transformation des données historiques de prix
     - Calcul des variations journalières des données historiques entre le prix le plus haut et le prix le plus bas
     pour chaque jour afin de mesurer la volatilité du marché dans le but de prédire le prix à la fermeture de chaque bougie.
 
