@@ -4,7 +4,6 @@
 #   pour l'analyse et le traitement par le modèle de Machine Learning.
 #     - transformation des données de streamings
 import pandas as pd
-import warnings
 from pymongo import MongoClient
 
 # authentification à MongoDB
@@ -23,10 +22,14 @@ collection = db["historical_data"]
 db_transformed = client["transform_data_binance"]
 collection_history_transformed = db_transformed["historical_data_transformed"]
 
+# création de l'index TTL de 24 heures (en secondes), nous indiquons à MongoDB de
+# supprimer automatiquement les documents de la collection
+# après 24 heures à compter de la valeur du champ timestamp.
+collection.create_index("timestamp", expireAfterSeconds=86400)
+
 
 # définition d'une fonction pour transformer les données historiques
 def transform_historical_data():
-    warnings.filterwarnings("ignore")
     """
     - Calcul des variations journalières des données historiques entre le prix le plus haut et le prix le plus bas
     pour chaque jour afin de mesurer la volatilité du marché dans le but de prédire le prix à la fermeture de chaque bougie.

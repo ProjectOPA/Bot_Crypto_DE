@@ -34,6 +34,10 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
+# création de l'index TTL de 24 heures (en secondes), nous indiquons à MongoDB de
+# supprimer automatiquement les documents de la collection
+# après 24 heures à compter de la valeur du champ timestamp.
+collection.create_index("timestamp", expireAfterSeconds=86400)
 
 # Dans le contexte du trading financier,
 # une bougie (candlestick ou candle en anglais)
@@ -76,9 +80,13 @@ def store_in_mongodb(data, symbol):
     # création d'une boucle pour parcourir chaque bougie (candle)
     # dans les données récupérées de l'API Binance
     for candle in data:
-        # convertion du timestamp de la bougie en objet datetime UTC
-        # et convertion du timestamp de la bougie de millisecondes en secondes "candle[0] / 1000.0"
-        # UTC est un standard de temps universel, et cela évite les confusions liées aux différents fuseaux horaires.
+        # convertion du timestamp de la bougie (qui est donné en millisecondes) en objet datetime
+        # en temps universel coordonné (UTC)
+        # cela permet de comprendre quand exactement cette bougie a eu lieu
+        # division par 1000 pour obtenir le timestamp en secondes car
+        # datetime.utcfromtimestamp() attend un timestamp en secondes
+        # et non en millisecondes qui sont donnés par l'API Binance
+        # sinon il renverra une erreur car il attend un timestamp en secondes
         timestamp = datetime.utcfromtimestamp(candle[0] / 1000.0)
         # extraction et convertion des string en float pour le traitement des données de prix et de volume de la bougie
         open_price = float(candle[1])
@@ -94,6 +102,7 @@ def store_in_mongodb(data, symbol):
             "symbol": symbol,
             # timestamp: c'est le moment précis de la bougie (candle) représentée par cette ligne
             # il est donné en heure universelle coordonnée (UTC) sous forme de chaîne de caractères formatée
+            # UTC est un standard de temps universel, et cela évite les confusions liées aux différents fuseaux horaires.
             "timestamp": timestamp,
             # open:c'est le prix d'ouverture de la bougie,
             # c'est-à-dire le prix auquel la paire de trading a commencé à être échangée à ce moment précis
@@ -126,6 +135,10 @@ def collect_historical_data():
             historical_data = get_binance_data(
                 symbol,
                 interval,
+                # conversion des dates en millisecondes pour l'API Binance
+                # multiplication par 1000 pour obtenir les dates en millisecondes
+                # la conversion en millesecondes est nécessaire pour obtenir les données historiques pour chaque jour,
+                # sinon l'API renverra une erreur car elle attend des dates en millisecondes
                 int(start_date.timestamp() * 1000),
                 int((start_date + timedelta(days=1)).timestamp() * 1000),
             )
@@ -144,10 +157,6 @@ if __name__ == "__main__":
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
 
-# attente d'une minute entre chaque jour pour éviter de surcharger l'API Binance
-# nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
-# et avoir une erreur au niveau du serveur de l'API
-# mise en pause de 1 minute entre chaque requete
 
 # un cronjob est créé pour lancer le script en arrière-plan
 # pour récupérer les données de la journée précédente
