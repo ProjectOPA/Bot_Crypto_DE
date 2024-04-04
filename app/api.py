@@ -121,4 +121,4 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 # exécution de l'API Fastapi dans le terminal
-# uvicorn main:app --reload ou python3 main.py
+# uvicorn api:app --reload ou python3 main.py
