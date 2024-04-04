@@ -25,7 +25,7 @@ collection_history_transformed = db_transformed["historical_data_transformed"]
 # création de l'index TTL de 24 heures (en secondes), nous indiquons à MongoDB de
 # supprimer automatiquement les documents de la collection
 # après 24 heures à compter de la valeur du champ timestamp.
-collection.create_index("timestamp", expireAfterSeconds=86400)
+collection_history_transformed.create_index("timestamp", expireAfterSeconds=86400)
 
 
 # définition d'une fonction pour transformer les données historiques
