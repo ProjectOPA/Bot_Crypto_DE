@@ -34,10 +34,6 @@ client = MongoClient(
 db = client["extract_data_binance"]
 collection = db["historical_data"]
 
-# création de l'index TTL de 24 heures (en secondes), nous indiquons à MongoDB de
-# supprimer automatiquement les documents de la collection
-# après 24 heures à compter de la valeur du champ timestamp.
-collection.create_index("timestamp", expireAfterSeconds=86400)
 
 # Dans le contexte du trading financier,
 # une bougie (candlestick ou candle en anglais)
@@ -122,6 +118,10 @@ def store_in_mongodb(data, symbol):
 
 # définition de la fonction pour executer la fonction de requete et de stockage
 def collect_historical_data():
+    # suppression de tous les documents existants dans la collection
+    # pour éviter les doublons de données
+    collection.delete_many({})
+
     # détermination de la date d'aujourd'hui
     end_date = datetime.now()
 
