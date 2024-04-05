@@ -23,7 +23,7 @@ sys.path.append(script_dir)
 from modeling_history_transformed import train_linear_regression_model
 
 print("Attendre 15 min que la collection de données historiques se remplisse")
-time.sleep(60*15)
+time.sleep(60*12)
 
 # Instanciation du modèle de regression entraînée
 regressor = train_linear_regression_model()
