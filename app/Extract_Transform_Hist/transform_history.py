@@ -46,10 +46,6 @@ def transform_historical_data():
     et stocke le résultat dans une nouvelle collection
 
     """
-<<<<<<< HEAD:app/transform/transform_history.py
-=======
-
->>>>>>> 7767694a829406b2173ea7854f79b706fced77da:app/Extract_Transform_Hist/transform_history.py
     # suppression de tous les documents existants dans la collection
     # pour éviter les doublons de données
     collection_history_transformed.delete_many({})
