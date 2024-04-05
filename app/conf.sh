@@ -3,10 +3,13 @@
 # Check the operating system
 if [[ $(uname) == "Linux" ]]; then
     # If on Linux, set PUBLIC_IP using curl
-    export PUBLIC_IP=$(curl -s http://ifconfig.me/ip)
+    #export PUBLIC_IP=$(curl -s http://ifconfig.me/ip)
+    export PUBLIC_IP=$(hostname -I | awk '{print $1}')
 elif [[ $(uname) == "Darwin" ]]; then
     # If on macOS, set PUBLIC_IP using ipconfig
+    echo "Mac Distribution of OPA service"
     export PUBLIC_IP=$(ipconfig getifaddr en0)
+    echo $PUBLIC_IP
 elif [[ $(uname) == "MINGW"* ]]; then
     # If on Windows (using Git Bash or similar), set PUBLIC_IP using PowerShell
     export PUBLIC_IP=$(powershell.exe -Command "(Test-Connection -ComputerName (hostname) -Count 1).IPAddressToString")
