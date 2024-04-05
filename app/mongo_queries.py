@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from pydantic import BaseModel
+from typing import Optional
 
 # connexion à MongoDB avec authentification
 mongo_user = "admin"
@@ -13,6 +14,10 @@ client = MongoClient(
 # connexion à la base de données "extract_data_binance" pour les données historiques
 db_historical = client["extract_data_binance"]
 collection_historical = db_historical["historical_data"]
+
+# connexion à la base de donnnées "transform_data_binance" pour les données historiques transformées
+db_transformed = client["transform_data_binance"]
+collection_history_transformed = db_transformed["historical_data_transformed"]
 
 # connexion à la base de données "streaming_data" pour les données de prédiction
 db_streaming = client["streaming_data"]
@@ -29,6 +34,17 @@ class HistoricalData(BaseModel):
     low: float
     close: float
     volume: float
+
+
+# définition du modèle de corps de réponse pour les données historiques transformées
+class TransformedData(BaseModel):
+    _id: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    taux_variation: float
 
 
 # définition du modèle de corps de réponse pour les données de prédiction
@@ -68,10 +84,10 @@ def get_historical_data(filter=None):
             # la méthode find() est appelée sans filtre
             # la méthode find() prend en argument la projection
             data = list(collection_historical.find({}, projection=projection))
+
         # définition d'une boucle pour formater les données
         # la boucle convertit l'objet ObjectId en chaîne pour l'ID
         # et convertit l'objet datetime en chaîne pour la date
-
         for item in data:
             item["_id"] = str(item["_id"])
             # le fomat de la date est de type ISODate sur MongoDB,
@@ -81,6 +97,34 @@ def get_historical_data(filter=None):
         # retourne les données formatées
         return data
     # lève une exception si une erreur est rencontrée
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# définition de la fonction pour récupérer des données historiques transformées de MongoDB
+# qui prend un nombre d'éléments en paramètre pour limiter les données
+# la fonction renvoie une liste de données historiques transformées si aucune erreur n'est levée
+def get_transformed_data(number_of_items: Optional[int] = None):
+    try:
+        # définition d'une variable pour stocker le nombre d'éléments
+        # si le nombre d'éléments est fourni, le nombre d'éléments est défini
+        # sinon, le nombre d'éléments est défini à 0
+        limit = number_of_items if number_of_items else 0
+
+        # définition  d'une variable pour stocker les données transformées
+        # création d'une liste de données transformées en utilisant la méthode find() de PyMongo
+        # appel de la méthode find() sur la collection_history_transformed pour récupérer les données
+        # appel de la méthode limit() pour limiter le nombre d'éléments
+        # la méthode limit() prend en argument le nombre d'éléments
+        transformed_data = list(collection_history_transformed.find().limit(limit))
+
+        # définition d'une boucle pour formater les données
+        # la boucle convertit l'objet ObjectId en chaîne pour l'ID
+        for item in transformed_data:
+            item["_id"] = str(item["_id"])
+
+        # retourne les données formatées
+        return transformed_data
     except Exception as e:
         return {"error": str(e)}
 
