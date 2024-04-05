@@ -3,13 +3,16 @@ from typing import List, Optional
 from fastapi import FastAPI
 from mongo_queries import (
     get_historical_data,
+    get_transformed_data,
     get_prediction_data,
     HistoricalData,
+    TransformedData,
     PredictionData,
 )
 
+
 # définition de l'application FastAPI
-app = FastAPI(
+api = FastAPI(
     title="API de requête sur les données historiques et de prédictions stockées dans MongoDB",
     version="1.0.0",
     openapi_tags=[
@@ -24,7 +27,7 @@ app = FastAPI(
 
 
 # définition de la route pour la page d'accueil de l'API
-@app.get("/", tags=["home"])
+@api.get("/", tags=["home"])
 async def get_home():
     """
     Description:
@@ -46,7 +49,7 @@ async def get_home():
 # la route est définie pour accepter des paramètres de requête start_date et end_date
 # les paramètres de requête sont optionnels et peuvent être fournis pour filtrer les données historiques
 # la route renvoie une liste de données historiques si aucune erreur n'est levée
-@app.get("/historical", response_model=List[HistoricalData], tags=["historical"])
+@api.get("/historical", response_model=List[HistoricalData], tags=["historical"])
 async def get_historical(
     start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
 ):
@@ -66,13 +69,58 @@ async def get_historical(
     try:
         # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
         filter = {}
+
         # si les dates de début et de fin sont fournies, le filtre est défini
         if start_date and end_date:
+            # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
+            # timestamp est le champ utilisé pour filtrer les données historiques
+            # $gte signifie "greater than or equal to" (supérieur ou égal à)
+            # $lte signifie "less than or equal to" (inférieur ou égal à)
             filter = {"timestamp": {"$gte": start_date, "$lte": end_date}}
-        # récupération des données historiques en fonction du filtre
+
+        # définition d'une variable pour stocker les données historiques
+        # utilisation de la fonction get_historical_data pour récupérer les données historiques en fonction du filtre
+        # la fonction prend en argument le filtre
         historical_data = get_historical_data(filter)
+
         # retourne les données historiques récupérées sous forme de liste HistoricalData si aucune erreur n'est levée
         return historical_data
+
+    # lève une exception si une erreur est rencontrée
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# définition de la route pour récupérer une liste d'éléments de la collection "historical_data_transformed"
+# pour les données transformées, nous utilons le modèle TransformedData pour la réponse
+# la route est définie pour accepter un paramètre de requête number_of_items
+# le paramètre de requête est optionnel et peut être fourni pour limiter les données transformées
+@api.get(
+    "/historical_transformed", response_model=List[TransformedData], tags=["historical"]
+)
+async def get_transformed(number_of_items: Optional[int] = None):
+    """
+    Description:
+    - Récupère une liste d'éléments de la collection "historical_data_transformed" de MongoDB.
+    - La collection "historical_data_transformed" contient des données transformées à partir des données historiques.
+    - Les données sont actualisées toutes les 24 heures.
+
+    Args:
+    - number_of_items (int, optional): Nombre d'éléments à récupérer. Aucun nombre n'est fourni par défaut.
+
+    Returns:
+    - list: Une liste TransformedData contenant les données transformées récupérées.
+
+    """
+    try:
+        # définition d'une variable pour stocker les données transformées
+        # utilisation de la fonction get_transformed_data pour récupérer les données transformées
+        # la fonction prend en argument le nombre d'éléments à récupérer
+        transformed_data = get_transformed_data(number_of_items)
+
+        # retourne les données transformées récupérées sous forme de liste TransformedData si aucune erreur n'est levée
+        return transformed_data
+
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
@@ -83,7 +131,7 @@ async def get_historical(
 # la route est définie pour accepter des paramètres de requête start_date et end_date
 # les paramètres de requête sont optionnels et peuvent être fournis pour filtrer les données de prédiction
 # la route renvoie une liste de données de prédiction si aucune erreur n'est levée
-@app.get("/predict", response_model=List[PredictionData], tags=["predict"])
+@api.get("/predict", response_model=List[PredictionData], tags=["predict"])
 async def get_prediction(
     start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
 ):
@@ -101,13 +149,23 @@ async def get_prediction(
     try:
         # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
         filter = {}
+
         # si les dates de début et de fin sont fournies, le filtre est défini
         if start_date and end_date:
+            # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
+            # timestamp est le champ utilisé pour filtrer les données de prédiction
+            # $gte signifie "greater than or equal to" (supérieur ou égal à)
+            # $lte signifie "less than or equal to" (inférieur ou égal à)
             filter = {"timestamp": {"$gte": start_date, "$lte": end_date}}
-        # récupération des données de prédiction en fonction du filtre
+
+        # définition d'une variable pour stocker les données de prédiction
+        # utilisation de la fonction get_prediction_data pour récupérer les données de prédiction en fonction du filtre
+        # la fonction prend en argument le filtre
         prediction_data = get_prediction_data(filter)
+
         # retourne les données de prédiction récupérées sous forme de liste PredictionData si aucune erreur n'est levée
         return prediction_data
+
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
@@ -121,4 +179,4 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 # exécution de l'API Fastapi dans le terminal
-# uvicorn api:app --reload ou python3 main.py
+# uvicorn api:api --reload ou python3 api.py

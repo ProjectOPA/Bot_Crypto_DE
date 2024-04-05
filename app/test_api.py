@@ -1,10 +1,14 @@
 from fastapi.testclient import TestClient
 from datetime import datetime
-from .api import app
-from .mongo_queries import get_historical_data, get_prediction_data
+from api import api
+from mongo_queries import (
+    get_historical_data,
+    get_transformed_data,
+    get_prediction_data,
+)
 
 # instanciation du client de test pour l'application FastAPI
-client = TestClient(app)
+client = TestClient(api)
 
 # Tests unitaires pour les routes de l'API FastAPI
 
@@ -32,6 +36,19 @@ def test_get_historical():
     # réponse attendue pour le contenu de la réponse
     # la réponse doit être une liste
     # car la route renvoie une liste de données historiques
+    assert isinstance(response.json(), list)
+
+
+# test de la route pour récupérer les données historiques transformées
+# définition de la fonction de test pour la route de récupération des données historiques transformées
+def test_get_transformed():
+    # instanciation du client de test
+    response = client.get("/historical_transformed")
+    # réponse attendue pour le statut de la requête
+    assert response.status_code == 200
+    # réponse attendue pour le contenu de la réponse
+    # la réponse doit être une liste
+    # car la route renvoie une liste de données historiques transformées
     assert isinstance(response.json(), list)
 
 
@@ -73,6 +90,30 @@ def test_get_historical_data_with_filter():
     # vérification que la réponse est une liste
     assert isinstance(data, list)
     # # vérification que la réponse n'est pas vide(à vérifier une fois que le chemin soit correct)
+    # assert len(data) > 0
+
+
+# test de la fonction pour récupérer des données historiques transformées de MongoDB sans limite
+# définition de la fonction de test pour la fonction get_transformed_data() sans limite
+def test_get_transformed_data_no_limit():
+    # appel de la fonction get_transformed_data() sans limite
+    data = get_transformed_data()
+    # vérification que la réponse est une liste
+    assert isinstance(data, list)
+    # # vérification que la réponse n'est pas vide (à vérifier une fois que le chemin soit correct)
+    # assert len(data) > 0
+
+
+# test de la fonction pour récupérer des données historiques transformées de MongoDB avec limite
+# définition de la fonction de test pour la fonction get_transformed_data() avec limite
+def test_get_transformed_data_with_limit():
+    # définition d'une limite pour le nombre d'éléments à récupérer
+    limit = 3
+    # appel de la fonction get_transformed_data() avec limite
+    data = get_transformed_data(limit)
+    # vérification que la réponse est une liste
+    assert isinstance(data, list)
+    # # vérification que la réponse n'est pas vide (à vérifier une fois que le chemin soit correct)
     # assert len(data) > 0
 
 
