@@ -9,7 +9,7 @@ from pymongo import MongoClient
 # authentification à MongoDB
 mongo_user = "admin"
 mongo_password = "pass"
-mongo_host = "localhost"
+mongo_host = "mongo-project-api-binance"
 mongo_port = 27017
 
 # connexion à la base de données et à la collection

@@ -11,18 +11,24 @@ from binance.client import AsyncClient
 from binance import BinanceSocketManager
 from binance.enums import *
 import json
+import time
+from datetime import datetime, timedelta
 
-# Ajout du dossier app/ pour que python puisse lire les paquets
+# Ajout du dossier actuel pour que python puisse lire les paquets
 script_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(script_dir, ".."))
+#sys.path.append(os.path.join(script_dir, ".."))
+sys.path.append(script_dir)
 
 # Import du modèle
-from modeling.modeling_history_transformed import train_linear_regression_model
+from modeling_history_transformed import train_linear_regression_model
+
+print("Attendre 15 min que la collection de données historiques se remplisse")
+time.sleep(60*15)
 
 # Instanciation du modèle de regression entraînée
 regressor = train_linear_regression_model()
 
-kafka_conf = {"bootstrap.servers": "localhost:9092"}
+kafka_conf = {"bootstrap.servers": "app-kafka-1:9092"}
 
 # Création de notre producer
 producer = Producer(kafka_conf)
@@ -57,7 +63,8 @@ async def main():
                 # utilisation du modèle de regression pour prédire le prochain prix de clotûre
                 next_close = regressor.predict(streamed_df)
 
-                streamed_final = {"open": float(res["k"]["o"]),
+                streamed_final = { "timestamp" : datetime.utcfromtimestamp(res["k"]["T"]/1000.0).strftime('%Y-%m-%d %H:%M:%S'),
+                            "open": float(res["k"]["o"]),
                             "high": float(res["k"]["h"]),
                             "low": float(res["k"]["l"]),
                             "close": float(res["k"]["c"]),
