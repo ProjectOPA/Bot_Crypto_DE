@@ -1,16 +1,6 @@
 version: "3.3"
 
 services:
-  api-binance:
-    image: ubuntu:22.04
-    container_name: ubuntu-project-api-binance
-    networks:
-      - my-network-from-compose
-    volumes:
-      - .:/home
-    ports:
-      - "8888:8888"
-    command: tail -f /dev/null
     
   database:
     container_name: mongo-project-api-binance
@@ -80,6 +70,52 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+
+  historic_handler: # Service qui se charge de l'extraction et de la transformation des données historiques
+    image: historic_handler:latest
+    container_name: historic_handler
+    networks:
+      - my-network-from-compose
+    depends_on:
+      - database
+
+  stream_producer:
+    image: stream_producer:latest
+    container_name: stream_producer
+    networks:
+      - my-network-from-compose
+    depends_on:
+      - kafka
+      - database
+
+  stream_loader:
+    image: stream_loader:latest
+    container_name: stream_loader
+    networks:
+      - my-network-from-compose
+    depends_on:
+      - kafka
+      - database
+
+  opa_api:
+    image: opa_api:latest
+    container_name: opa_api
+    networks:
+      - my-network-from-compose
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
+  #mongodb_charts:
+    #image: quay.io/mongodb/charts:19.12.1
+    #depends_on:
+      #- database
+    #container_name: mongodb_charts
+    #ports:
+      #- "80:80"
+    #networks:
+      #- my-network-from-compose
 
 networks:
   my-network-from-compose:

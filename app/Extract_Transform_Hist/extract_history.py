@@ -59,21 +59,6 @@ interval = "2h"
 # pour requeter des données historiques depuis l'API Binance
 # selon le shéma de requête donné par l'API
 def get_binance_data(symbol, interval, start_date, end_date):
-    """
-    Description:
-    - Récupération des données historiques pour un symbole spécifié
-    sur une période de temps spécifiée
-
-    Args:
-    - symbol: le symbole de la paire de trading pour laquelle les données sont collectées
-    - interval: l'intervalle de temps pour lequel les données sont collectées
-    - start_date: la date de début pour laquelle les données sont collectées
-    - end_date: la date de fin pour laquelle les données sont collectées
-
-    Returns:
-    - les données historiques pour un symbole spécifié
-    sur une période de temps spécifiée
-    """
     params = {
         "symbol": symbol,
         "interval": interval,
@@ -88,29 +73,12 @@ def get_binance_data(symbol, interval, start_date, end_date):
 # définition d'une fonction
 # pour stocker la réponse de la requete dans MongoDB
 def store_in_mongodb(data, symbol):
-    """
-    Description:
-    - Stockage des données historiques dans MongoDB
-
-    Args:
-    - data: les données historiques pour un symbole spécifié
-    sur une période de temps spécifiée
-    - symbol: le symbole de la paire de trading pour laquelle les données sont collectées
-
-    Returns:
-    - stocke les données dans une collection nommée "historical_data"
-    """
-
     # création d'une boucle pour parcourir chaque bougie (candle)
     # dans les données récupérées de l'API Binance
     for candle in data:
-        # convertion du timestamp de la bougie (qui est donné en millisecondes) en objet datetime
-        # en temps universel coordonné (UTC)
-        # cela permet de comprendre quand exactement cette bougie a eu lieu
-        # division par 1000 pour obtenir le timestamp en secondes car
-        # datetime.utcfromtimestamp() attend un timestamp en secondes
-        # et non en millisecondes qui sont donnés par l'API Binance
-        # sinon il renverra une erreur car il attend un timestamp en secondes
+        # convertion du timestamp de la bougie en objet datetime UTC
+        # et convertion du timestamp de la bougie de millisecondes en secondes "candle[0] / 1000.0"
+        # UTC est un standard de temps universel, et cela évite les confusions liées aux différents fuseaux horaires.
         timestamp = datetime.utcfromtimestamp(candle[0] / 1000.0)
         # extraction et convertion des string en float pour le traitement des données de prix et de volume de la bougie
         open_price = float(candle[1])
@@ -126,7 +94,6 @@ def store_in_mongodb(data, symbol):
             "symbol": symbol,
             # timestamp: c'est le moment précis de la bougie (candle) représentée par cette ligne
             # il est donné en heure universelle coordonnée (UTC) sous forme de chaîne de caractères formatée
-            # UTC est un standard de temps universel, et cela évite les confusions liées aux différents fuseaux horaires.
             "timestamp": timestamp,
             # open:c'est le prix d'ouverture de la bougie,
             # c'est-à-dire le prix auquel la paire de trading a commencé à être échangée à ce moment précis
@@ -146,25 +113,6 @@ def store_in_mongodb(data, symbol):
 
 # définition de la fonction pour executer la fonction de requete et de stockage
 def collect_historical_data():
-    """
-    Description:
-    - Suppression de tous les documents existants dans la collection
-    - Récupération des données historiques pour les symboles spécifiés
-    sur une période de 4 ans et stockage des données dans MongoDB
-
-    Arguments:
-    - aucun argument n'est requis
-
-    Returns:
-    - tant que la date de début est inférieure ou égale à la date de fin,
-    les données historiques sont récupérées pour chaque jour
-    et stockées dans MongoDB
-
-    """
-    # suppression de tous les documents existants dans la collection
-    # pour éviter les doublons de données
-    collection.delete_many({})
-
     # détermination de la date d'aujourd'hui
     end_date = datetime.now()
 
@@ -178,10 +126,6 @@ def collect_historical_data():
             historical_data = get_binance_data(
                 symbol,
                 interval,
-                # conversion des dates en millisecondes pour l'API Binance
-                # multiplication par 1000 pour obtenir les dates en millisecondes
-                # la conversion en millesecondes est nécessaire pour obtenir les données historiques pour chaque jour,
-                # sinon l'API renverra une erreur car elle attend des dates en millisecondes
                 int(start_date.timestamp() * 1000),
                 int((start_date + timedelta(days=1)).timestamp() * 1000),
             )
@@ -200,6 +144,10 @@ if __name__ == "__main__":
 # faire CTRL+C pour arreter la boucle
 # ou dans un autre terminal sudo docker-compose down
 
+# attente d'une minute entre chaque jour pour éviter de surcharger l'API Binance
+# nous évitons de faire trop de requêtes à l'API en même temps pour ne pas être bloqué
+# et avoir une erreur au niveau du serveur de l'API
+# mise en pause de 1 minute entre chaque requete
 
 # un cronjob est créé pour lancer le script en arrière-plan
 # pour récupérer les données de la journée précédente

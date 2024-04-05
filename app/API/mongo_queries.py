@@ -1,11 +1,15 @@
 from pymongo import MongoClient
 from pydantic import BaseModel
+<<<<<<< HEAD:app/mongo_queries.py
+=======
+from fastapi import HTTPException
+>>>>>>> 7767694a829406b2173ea7854f79b706fced77da:app/API/mongo_queries.py
 from typing import Optional
 
 # connexion à MongoDB avec authentification
 mongo_user = "admin"
 mongo_password = "pass"
-mongo_host = "localhost"
+mongo_host = "mongo-project-api-binance"
 mongo_port = 27017
 client = MongoClient(
     f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/"
@@ -35,6 +39,15 @@ class HistoricalData(BaseModel):
     close: float
     volume: float
 
+# définition du modèle de corps de réponse pour les données historiques transformées
+class TransformedData(BaseModel):
+    _id: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    taux_variation: float
 
 # définition du modèle de corps de réponse pour les données historiques transformées
 class TransformedData(BaseModel):
@@ -50,14 +63,19 @@ class TransformedData(BaseModel):
 # définition du modèle de corps de réponse pour les données de prédiction
 class PredictionData(BaseModel):
     _id: str
-    symbol: str
     timestamp: str
-    prediction: float
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    next_close: float
 
 
 # définition de la fonction pour récupérer des données historiques de MongoDB
 # qui prend un filtre en paramètre pour filtrer les données
 # la fonction renvoie une liste de données historiques si aucune erreur n'est levée
+    
 def get_historical_data(filter=None):
     # projection est utilisé pour filtrer les champs à renvoyer
     # 1 signifie que le champ est inclus, 0 signifie qu'il est exclu
@@ -101,6 +119,10 @@ def get_historical_data(filter=None):
         return {"error": str(e)}
 
 
+<<<<<<< HEAD:app/mongo_queries.py
+=======
+
+>>>>>>> 7767694a829406b2173ea7854f79b706fced77da:app/API/mongo_queries.py
 # définition de la fonction pour récupérer des données historiques transformées de MongoDB
 # qui prend un nombre d'éléments en paramètre pour limiter les données
 # la fonction renvoie une liste de données historiques transformées si aucune erreur n'est levée
@@ -128,14 +150,26 @@ def get_transformed_data(number_of_items: Optional[int] = None):
     except Exception as e:
         return {"error": str(e)}
 
+<<<<<<< HEAD:app/mongo_queries.py
 
+=======
+>>>>>>> 7767694a829406b2173ea7854f79b706fced77da:app/API/mongo_queries.py
 # définition de la fonction pour récupérer des données de prédiction de MongoDB
 def get_prediction_data(filter=None):
     # projection est utilisé pour filtrer les champs à renvoyer
     # 1 signifie que le champ est inclus, 0 signifie qu'il est exclu
     # par défaut, tous les champs sont inclus
     try:
-        projection = {"_id": 1, "symbol": 1, "timestamp": 1, "prediction": 1}
+        projection = { 
+            "_id": 1,
+            "timestamp": 1,
+            "open": 1,
+            "high": 1,
+            "low": 1,
+            "close": 1,
+            "volume": 1,
+            "next_close": 1
+        }
         # si un filtre est fourni, les données sont filtrées en fonction du filtre
         if filter:
             # définition de data pour stocker les données filtrées
@@ -148,7 +182,9 @@ def get_prediction_data(filter=None):
             # si aucun filtre n'est fourni, toutes les données sont récupérées
             # la méthode find() est appelée sans filtre
             # la méthode find() prend en argument la projection
+
             prediction_data = list(collection_streaming.find({}, projection=projection))
+            
         # définition d'une boucle pour formater les données
         # la boucle convertit l'objet ObjectId en chaîne pour l'ID
         # et convertit l'objet datetime en chaîne pour la date
@@ -163,3 +199,19 @@ def get_prediction_data(filter=None):
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
+
+
+#Fonction pour Consieller sur un investissement
+def advice():
+    latest = collection_streaming.find_one(sort=[("timestamp", -1)])
+
+    if latest:
+        result = {"next_price":str(latest.get("next_close"))+" USD",
+                  "actual_price": str(latest.get("close"))+" USD" }
+        if latest.get("next_close") >= latest.get("close"):
+            result['advice'] = "En vue de l'augmentation prochaine de la valeur nous vous conseillons d'acheter"
+        else:
+            result['advice'] = "En vue de la diminution prochaine de la valeur nous vous conseillons de vendre"
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Aucun document dans la collection des prédictions")

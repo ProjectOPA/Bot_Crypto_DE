@@ -9,3 +9,9 @@
 
 # ignorer le répertoire de pytest
 *.pytest_cache/
+
+# ignorer les anciens dossiers de développement
+*.extract
+*.load
+*.modeling
+*.transform

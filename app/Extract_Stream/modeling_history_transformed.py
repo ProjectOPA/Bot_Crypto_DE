@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 # authentification à MongoDB
 mongo_user = "admin"
 mongo_password = "pass"
-mongo_host = "localhost"
+mongo_host = "mongo-project-api-binance"
 mongo_port = 27017
 
 # connexion à la base de données et à la collection
@@ -98,6 +98,6 @@ def train_linear_regression_model():
 
 
 # si le script est exécuté directement en ligne de commande (et non importé en tant que module)
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # appel de la fonction pour entraîner le modèle de régression linéaire
-    model = train_linear_regression_model()
+    #model = train_linear_regression_model()
