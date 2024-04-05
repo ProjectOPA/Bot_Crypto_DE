@@ -5,23 +5,23 @@ from mongo_queries import (
     get_historical_data,
     get_transformed_data,
     get_prediction_data,
+    advice,
     HistoricalData,
     TransformedData,
     PredictionData,
 )
 
-
 # définition de l'application FastAPI
 api = FastAPI(
-    title="API de requête sur les données historiques et de prédictions stockées dans MongoDB",
+    title="API request historical data and predictions",
     version="1.0.0",
     openapi_tags=[
         {"name": "home", "description": "page d'accueil de l'API"},
         {
             "name": "historical",
-            "description": "page requete sur les données historiques",
+            "description": "terminaisons requetes sur les données historiques",
         },
-        {"name": "predict", "description": "page requete sur les prédictions"},
+        {"name": "predict", "description": "terminaisons requetes sur les prédictions"},
     ],
 )
 
@@ -89,8 +89,9 @@ async def get_historical(
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
+    
 
-
+    
 # définition de la route pour récupérer une liste d'éléments de la collection "historical_data_transformed"
 # pour les données transformées, nous utilons le modèle TransformedData pour la réponse
 # la route est définie pour accepter un paramètre de requête number_of_items
@@ -126,6 +127,7 @@ async def get_transformed(number_of_items: Optional[int] = None):
         return {"error": str(e)}
 
 
+
 # définition de la route pour récupérer les données de prédiction sur une période donnée
 # pour les données de prédiction, nous utilisons le modèle PredictionData pour la réponse
 # la route est définie pour accepter des paramètres de requête start_date et end_date
@@ -149,26 +151,24 @@ async def get_prediction(
     try:
         # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
         filter = {}
-
         # si les dates de début et de fin sont fournies, le filtre est défini
         if start_date and end_date:
-            # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
-            # timestamp est le champ utilisé pour filtrer les données de prédiction
-            # $gte signifie "greater than or equal to" (supérieur ou égal à)
-            # $lte signifie "less than or equal to" (inférieur ou égal à)
             filter = {"timestamp": {"$gte": start_date, "$lte": end_date}}
-
-        # définition d'une variable pour stocker les données de prédiction
-        # utilisation de la fonction get_prediction_data pour récupérer les données de prédiction en fonction du filtre
-        # la fonction prend en argument le filtre
+        # récupération des données de prédiction en fonction du filtre
         prediction_data = get_prediction_data(filter)
-
         # retourne les données de prédiction récupérées sous forme de liste PredictionData si aucune erreur n'est levée
         return prediction_data
-
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
+    
+
+@api.get("/invest", name = "Investment adviser", tags=["predict"])
+async def get_advise():
+    """
+    Cette point de terminaison permet d'avoir des conseils d'achat ou de vente du Bitcoin en fonction de la valeur prochaine de ctte cryptomonnaie prédite par notre modèle ML
+    """
+    return advice()
 
 
 # exécution de l'API FastAPI
@@ -176,7 +176,7 @@ async def get_prediction(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(api, host="0.0.0.0", port=8000)
 
 # exécution de l'API Fastapi dans le terminal
 # uvicorn api:api --reload ou python3 api.py
