@@ -11,8 +11,8 @@
 *.pytest_cache/
 
 # ignorer les anciens dossiers de développement
-*.extract
-*.load
-*.modeling
-*.transform
-*.test_API
+*.extract/
+*.load/
+*.modeling/
+*.transform/
+*.test_API/
