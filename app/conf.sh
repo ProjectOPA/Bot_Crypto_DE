@@ -7,6 +7,7 @@ if [[ $(uname) == "Linux" ]]; then
     echo "Linux Distribution of OPA service"
     export PUBLIC_IP=$(hostname -I | awk '{print $1}')
     echo $PUBLIC_IP
+
 elif [[ $(uname) == "Darwin" ]]; then
     # If on macOS, set PUBLIC_IP using ipconfig
     echo "Mac Distribution of OPA service"
