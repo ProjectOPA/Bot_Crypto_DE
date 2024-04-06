@@ -26,7 +26,7 @@ mongo_conf = {
 }
 
 # Attendre un moment pour que les données soient disponible dans le topic kafka
-time.sleep(60*18)
+time.sleep(60*14)
 
 # Création du consommateur Kafka
 consumer = Consumer(kafka_conf)
