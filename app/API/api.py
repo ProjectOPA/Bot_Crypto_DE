@@ -164,7 +164,14 @@ async def get_prediction(
 @api.get("/invest", name="Investment adviser", tags=["predict"])
 async def get_advise():
     """
-    Cette point de terminaison permet d'avoir des conseils d'achat ou de vente du Bitcoin en fonction de la valeur prochaine de ctte cryptomonnaie prédite par notre modèle ML
+    Description:
+    - Point de terminaison permettant d'obtenir un conseil d'investissement sur le BITCOIN.
+
+    Args:
+    - Aucun argument n'est requis.
+
+    Returns:
+    - dict: valeur prochaine prédite de la paire BTCUSDT, valeur actuelle de la paire, conseil.
     """
     return advice()
 
