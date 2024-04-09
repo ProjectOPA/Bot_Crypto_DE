@@ -22,7 +22,7 @@ Pour lancer le Bot de crypto, effectuer chronologiquement les actions suivantes:
 
 - cd app
 
-- ./conf.sh
+- sudo ./conf.sh
 
 Suite à ce lancement, des containers se lancent:
 
@@ -35,6 +35,8 @@ Suite à ce lancement, des containers se lancent:
 - **Container stream_producer** : Service permettant de récupérer les données de streaming, d'appliquer le modèle de prédiction et de stocker les données dans un topic kafka
 - **Container stream_loader** : Service permettant l'acheminement des données de kafka vers MongoDB
 - **Container opa_api** : API permettant d'interagir avec notre Bot
+
+Il est important de préciser que dans conf.sh, une variable d'environnement $PUBLIC_IP essentielle pour le bon fonctionnement du server kafka est intanciée. En fonction du système de distribution, cette dernière sera automatiquement calculée. Elle représente l'adresse Ipv4 de la machine hôte. En cas de non fonctionnement du serveur Kafka, PUBLIC_IP est certainement en cause. Vérifiez sa présence en essayant : echo $PUBLIC_IP
 
 ## Utilisation
 Une fois les services lancés, vous pouvez accéder sur votre navigateur au service suivant:
