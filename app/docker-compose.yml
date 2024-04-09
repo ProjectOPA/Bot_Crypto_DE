@@ -108,15 +108,7 @@ services:
     depends_on:
       - database
 
-  #mongodb_charts:
-    #image: quay.io/mongodb/charts:19.12.1
-    #depends_on:
-      #- database
-    #container_name: mongodb_charts
-    #ports:
-      #- "80:80"
-    #networks:
-      #- my-network-from-compose
+    
 
 networks:
   my-network-from-compose:
