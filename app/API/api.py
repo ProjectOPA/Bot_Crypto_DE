@@ -1,6 +1,17 @@
 from datetime import datetime
 from typing import List, Optional
 from fastapi import FastAPI
+
+# import sys et os pour ajouter le chemin du répertoire parent
+# au chemin du module pour importer les fonctions
+# de requête MongoDB du fichier mongo_queries
+import sys
+import os
+
+# ajout du chemin du répertoire parent au chemin du module
+# pour importer les fonctions de requête MongoDB
+sys.path.insert(0, os.path.dirname(__file__))
+
 from mongo_queries import (
     get_historical_data,
     get_transformed_data,
@@ -69,7 +80,6 @@ async def get_historical(
     try:
         # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
         filter = {}
-
         # si les dates de début et de fin sont fournies, le filtre est défini
         if start_date and end_date:
             # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
@@ -113,10 +123,15 @@ async def get_transformed(number_of_items: Optional[int] = None):
 
     """
     try:
+        # définition d'une variable pour stocker la limite des données
+        # si la limite est fournie, les données sont récupérées en fonction de la limite
+        # sinon, toutes les données sont récupérées
+        limit = number_of_items if number_of_items else 0
         # définition d'une variable pour stocker les données transformées
         # utilisation de la fonction get_transformed_data pour récupérer les données transformées
         # la fonction prend en argument le nombre d'éléments à récupérer
-        transformed_data = get_transformed_data(number_of_items)
+        # récupèration des données transformées en fonction de la limite
+        transformed_data = get_transformed_data(limit)
 
         # retourne les données transformées récupérées sous forme de liste TransformedData si aucune erreur n'est levée
         return transformed_data
@@ -151,11 +166,17 @@ async def get_prediction(
         filter = {}
         # si les dates de début et de fin sont fournies, le filtre est défini
         if start_date and end_date:
+            # définition du filtre pour la requête MongoDB en fonction des dates de début et de fin
+            # timestamp est le champ utilisé pour filtrer les données historiques
+            # $gte signifie "greater than or equal to" (supérieur ou égal à)
+            # $lte signifie "less than or equal to" (inférieur ou égal à)
             filter = {"timestamp": {"$gte": start_date, "$lte": end_date}}
+
         # récupération des données de prédiction en fonction du filtre
         prediction_data = get_prediction_data(filter)
         # retourne les données de prédiction récupérées sous forme de liste PredictionData si aucune erreur n'est levée
         return prediction_data
+
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
@@ -176,12 +197,12 @@ async def get_advise():
     return advice()
 
 
-# exécution de l'API FastAPI
-# point d'entrée de l'application FastAPI pour l'exécution de l'API
+# # exécution de l'API FastAPI
+# # point d'entrée de l'application FastAPI pour l'exécution de l'API
 # if __name__ == "__main__":
-#   import uvicorn
+#     import uvicorn
 
-#  uvicorn.run(app, host="0.0.0.0", port=8000)
+# uvicorn.run(api, host="0.0.0.0", port=8000)
 
-# exécution de l'API Fastapi dans le terminal
-# uvicorn main:app --reload ou python3 main.py
+# # exécution de l'API Fastapi dans le terminal
+# # uvicorn api:api --reload ou python3 api.py
