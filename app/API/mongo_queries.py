@@ -111,17 +111,34 @@ def get_historical_data(filter=None):
 # la fonction renvoie une liste de données historiques transformées si aucune erreur n'est levée
 def get_transformed_data(number_of_items: Optional[int] = None):
     try:
+        projection = {
+            "_id": 1,
+            "open": 1,
+            "high": 1,
+            "low": 1,
+            "close": 1,
+            "volume": 1,
+            "taux_variation": 1,
+        }
         # définition d'une variable pour stocker le nombre d'éléments
         # si le nombre d'éléments est fourni, le nombre d'éléments est défini
         # sinon, le nombre d'éléments est défini à 0
         limit = number_of_items if number_of_items else 0
 
-        # définition  d'une variable pour stocker les données transformées
-        # création d'une liste de données transformées en utilisant la méthode find() de PyMongo
-        # appel de la méthode find() sur la collection_history_transformed pour récupérer les données
-        # appel de la méthode limit() pour limiter le nombre d'éléments
-        # la méthode limit() prend en argument le nombre d'éléments
-        transformed_data = list(collection_history_transformed.find().limit(limit))
+        # si un nombre d'éléments est fourni, les données sont limitées en fonction du nombre d'éléments
+        if limit:
+            # définition  d'une variable pour stocker les données transformées
+            # création d'une liste de données transformées en utilisant la méthode find() de PyMongo
+            # appel de la méthode find() sur la collection_history_transformed pour récupérer les données
+            # appel de la méthode limit() pour limiter le nombre d'éléments
+            # la méthode limit() prend en argument le nombre d'éléments
+            transformed_data = list(
+                collection_history_transformed.find(projection=projection).limit(limit)
+            )
+        else:
+            transformed_data = list(
+                collection_history_transformed.find({}, projection=projection)
+            )
 
         # définition d'une boucle pour formater les données
         # la boucle convertit l'objet ObjectId en chaîne pour l'ID
@@ -150,6 +167,7 @@ def get_prediction_data(filter=None):
             "volume": 1,
             "next_close": 1,
         }
+
         # si un filtre est fourni, les données sont filtrées en fonction du filtre
         if filter:
             # définition de data pour stocker les données filtrées
@@ -162,7 +180,6 @@ def get_prediction_data(filter=None):
             # si aucun filtre n'est fourni, toutes les données sont récupérées
             # la méthode find() est appelée sans filtre
             # la méthode find() prend en argument la projection
-
             prediction_data = list(collection_streaming.find({}, projection=projection))
 
         # définition d'une boucle pour formater les données
@@ -174,8 +191,10 @@ def get_prediction_data(filter=None):
             # .isoformat() est une méthode de l'objet datetime en Python,
             # qui convertit un objet datetime en une chaîne de caractères représentant la date et l'heure au format ISO 8601.
             item["timestamp"] = item["timestamp"].isoformat()
+
         # retourne les données formatées
         return prediction_data
+
     # lève une exception si une erreur est rencontrée
     except Exception as e:
         return {"error": str(e)}
